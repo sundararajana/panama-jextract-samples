@@ -29,7 +29,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.NativeAllocationScope;
 import org.unix.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.unix.libproc_h.*;
@@ -38,7 +37,7 @@ public class LibprocMain {
     private static final int NAME_BUF_MAX = 256;
 
     public static void main(String[] args) {
-        try (var scope = NativeAllocationScope.unboundedScope()) {
+        try (var scope = new CScope()) {
             // get the number of processes
             int numPids = proc_listallpids(NULL, 0);
             // allocate an array

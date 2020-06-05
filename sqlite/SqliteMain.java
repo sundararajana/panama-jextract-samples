@@ -31,7 +31,7 @@
 
 import org.sqlite.Cpointer;
 import org.sqlite.Cstring;
-import org.sqlite.RuntimeHelper.CScope;
+import org.sqlite.CScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
 
@@ -102,12 +102,11 @@ public class SqliteMain {
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;
-            });
-            scope.register(callback);
+            }, scope);
 
             // select query
             sql = Cstring.toCString("SELECT * FROM EMPLOYEE", scope);
-            rc = sqlite3_exec(dbPtr, sql, callback.baseAddress(), NULL, errMsgPtrPtr);
+            rc = sqlite3_exec(dbPtr, sql, callback, NULL, errMsgPtrPtr);
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);

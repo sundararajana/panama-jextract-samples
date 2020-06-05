@@ -30,7 +30,6 @@
  */
 
 import jdk.incubator.foreign.MemoryAddress;
-import jdk.incubator.foreign.NativeAllocationScope;
 import lapack.*;
 import static lapack.lapacke_h.*;
 
@@ -38,7 +37,7 @@ public class TestLapack {
     public static void main(String[] args) {
 
         /* Locals */
-        try (var scope = NativeAllocationScope.unboundedScope()) {
+        try (var scope = new CScope()) {
             var A = Cdouble.allocateArray(new double[]{
                     1, 2, 3, 4, 5, 1, 3, 5, 2, 4, 1, 4, 2, 5, 3
             }, scope);
