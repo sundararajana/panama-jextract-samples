@@ -66,7 +66,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + Cstring.toJavaString(Cpointer.get(errMsgPtrPtr)));
+                System.err.println("SQL error: " + Cstring.toJavaStringRestricted(Cpointer.get(errMsgPtrPtr)));
                 sqlite3_free(Cpointer.get(errMsgPtrPtr));
             } else {
                 System.out.println("employee table created");
@@ -83,7 +83,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + Cstring.toJavaString(Cpointer.get(errMsgPtrPtr)));
+                System.err.println("SQL error: " + Cstring.toJavaStringRestricted(Cpointer.get(errMsgPtrPtr)));
                 sqlite3_free(Cpointer.get(errMsgPtrPtr));
             } else {
                 System.out.println("rows inserted");
@@ -94,11 +94,11 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                argv = Cpointer.asArray(argv, argc);
-                columnNames = Cpointer.asArray(columnNames, argc);
+                argv = Cpointer.asArrayRestricted(argv, argc);
+                columnNames = Cpointer.asArrayRestricted(columnNames, argc);
                 for (int i = 0; i < argc; i++) {
-                     String name = Cstring.toJavaString(Cpointer.get(columnNames, i));
-                     String value = Cstring.toJavaString(Cpointer.get(argv, i));
+                     String name = Cstring.toJavaStringRestricted(Cpointer.get(columnNames, i));
+                     String value = Cstring.toJavaStringRestricted(Cpointer.get(argv, i));
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;

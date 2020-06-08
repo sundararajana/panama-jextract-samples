@@ -30,11 +30,11 @@
  */
 
 import org.openjdk.Cint;
+import org.openjdk.CScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.openjdk.Cstring.toCString;
-import static org.openjdk.Cstring.toJavaString;
+import static org.openjdk.Cstring.toJavaStringRestricted;
 import static org.openjdk.jimage_h.*;
-import static org.openjdk.RuntimeHelper.CScope;
 
 public class JImageFile {
     public static void main(String[] args) {
@@ -44,7 +44,7 @@ public class JImageFile {
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
 
-            var mod = toJavaString(JIMAGE_PackageToModule(jimageFile,
+            var mod = toJavaStringRestricted(JIMAGE_PackageToModule(jimageFile,
                 toCString("java/util", scope)));
             System.out.println(mod);
 
@@ -53,14 +53,13 @@ public class JImageFile {
 
             var visitor = JIMAGE_ResourceIterator$visitor.allocate(
                 (jimage, module_name, version, package_name, name, extension, arg) -> {
-                   System.out.println("module " + toJavaString(module_name));
-                   System.out.println("package " + toJavaString(package_name));
-                   System.out.println("name " + toJavaString(name));
+                   System.out.println("module " + toJavaStringRestricted(module_name));
+                   System.out.println("package " + toJavaStringRestricted(package_name));
+                   System.out.println("name " + toJavaStringRestricted(name));
                    return 1;
-                });
-            scope.register(visitor);
+                }, scope);
 
-            JIMAGE_ResourceIterator(jimageFile, visitor.baseAddress(), NULL);
+            JIMAGE_ResourceIterator(jimageFile, visitor, NULL);
 
             JIMAGE_Close(jimageFile);
         }
