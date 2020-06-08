@@ -110,7 +110,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + Cstring.toJavaString(Cpointer.get(errMsgPtrPtr)));
+                System.err.println("SQL error: " + Cstring.toJavaStringRestricted(Cpointer.get(errMsgPtrPtr)));
                 sqlite3_free(Cpointer.get(errMsgPtrPtr));
             } else {
                 System.out.println("done");
