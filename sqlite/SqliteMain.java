@@ -29,15 +29,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.NativeScope;
 import org.sqlite.Cpointer;
 import org.sqlite.Cstring;
-import org.sqlite.CScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
 
 public class SqliteMain {
    public static void main(String[] args) throws Exception {
-        try (var scope = new CScope()) {
+        try (var scope = NativeScope.unboundedScope()) {
             // char** errMsgPtrPtr;
             var errMsgPtrPtr = Cpointer.allocate(NULL, scope);
 

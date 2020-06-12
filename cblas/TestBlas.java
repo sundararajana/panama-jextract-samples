@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.NativeScope;
 import blas.*;
 import static blas.RuntimeHelper.*;
 import static blas.cblas_h.*;
@@ -52,7 +53,7 @@ public class TestBlas {
         alpha = 1;
         beta = 0;
  
-        try (var scope = new CScope()) {
+        try (var scope = NativeScope.unboundedScope()) {
             var a = Cdouble.allocateArray(m*n, scope);
             var x = Cdouble.allocateArray(n, scope);
             var y = Cdouble.allocateArray(n, scope);

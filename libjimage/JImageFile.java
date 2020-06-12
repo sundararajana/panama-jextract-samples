@@ -29,8 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.NativeScope;
 import org.openjdk.Cint;
-import org.openjdk.CScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.openjdk.Cstring.toCString;
 import static org.openjdk.Cstring.toJavaStringRestricted;
@@ -39,7 +39,7 @@ import static org.openjdk.jimage_h.*;
 public class JImageFile {
     public static void main(String[] args) {
         String javaHome = System.getProperty("java.home");
-        try (var scope = new CScope()) {
+        try (var scope = NativeScope.unboundedScope()) {
             var jintResPtr = Cint.allocate(0, scope);
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
