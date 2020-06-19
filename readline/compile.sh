@@ -1,3 +1,3 @@
 jextract -l readline -t org.unix \
-  -I /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include \
-   /Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/usr/include/readline/readline.h
+  -I /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include \
+   /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/readline/readline.h

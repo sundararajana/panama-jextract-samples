@@ -33,7 +33,6 @@ import jdk.incubator.foreign.NativeScope;
 import static com.github.git2_h.*;
 import static jdk.incubator.foreign.CSupport.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
-import static com.github.Cstring.*;
 
 public class GitClone {
     public static void main(String[] args) {
