@@ -30,17 +30,15 @@
  */
 
 import jdk.incubator.foreign.NativeScope;
-import org.openjdk.Cint;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
-import static org.openjdk.Cstring.toCString;
-import static org.openjdk.Cstring.toJavaStringRestricted;
 import static org.openjdk.jimage_h.*;
+import static jdk.incubator.foreign.CSupport.*;
 
 public class JImageFile {
     public static void main(String[] args) {
         String javaHome = System.getProperty("java.home");
         try (var scope = NativeScope.unboundedScope()) {
-            var jintResPtr = Cint.allocate(0, scope);
+            var jintResPtr = scope.allocate(C_INT, 0);
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
 

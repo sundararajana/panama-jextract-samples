@@ -29,10 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.unix.Cstring;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.unix.RuntimeHelper.*;
 import static org.unix.curl_h.*;
+import static jdk.incubator.foreign.CSupport.*;
 
 public class CurlMain {
    public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class CurlMain {
        curl_global_init(CURL_GLOBAL_DEFAULT());
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
-           try (var s = Cstring.toCString(urlStr)) {
+           try (var s = toCString(urlStr)) {
                var url = s.baseAddress();
                curl_easy_setopt(curl, CURLOPT_URL(), url);
                int res = curl_easy_perform(curl);

@@ -29,13 +29,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.unix.Cstring;
 import static org.unix.RuntimeHelper.*;
 import static org.unix.readline_h.*;
+import static jdk.incubator.foreign.CSupport.*;
 
 public class Readline {
     public static void main(String[] args) {
-        try (var s = Cstring.toCString("name? ")) {
+        try (var s = toCString("name? ")) {
             var pstr = s.baseAddress();
             // call "readline" API
             var p = readline(pstr);
@@ -43,7 +43,7 @@ public class Readline {
             // print char* as is
             System.out.println(p);
             // convert char* ptr from readline as Java String & print it
-            System.out.println("Hello, " + Cstring.toJavaStringRestricted(p));
+            System.out.println("Hello, " + toJavaStringRestricted(p));
         }
     }
 }

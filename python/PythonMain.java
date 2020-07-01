@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import org.python.Cstring;
+import static jdk.incubator.foreign.CSupport.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted python 'header' class
 import static org.python.RuntimeHelper.*;
@@ -40,7 +40,7 @@ public class PythonMain {
         String script = "print(sum([33, 55, 66])); print('Hello from Python!')\n";
 
         Py_Initialize();
-        try (var s = Cstring.toCString(script)) {
+        try (var s = toCString(script)) {
             var str = s.baseAddress();
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();

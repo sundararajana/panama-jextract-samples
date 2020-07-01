@@ -29,12 +29,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.MemoryAddress;
+import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.NativeScope;
 import blas.*;
 import static blas.RuntimeHelper.*;
 import static blas.cblas_h.*;
+import static jdk.incubator.foreign.CSupport.*;
 
 public class TestBlas {
+    private static void setDouble(MemoryAddress addr, int element, double value) {
+        MemoryAccess.setDouble(addr, element*C_DOUBLE.byteSize(), value);
+    }
+
+    private static double getDouble(MemoryAddress addr, int element) {
+        return MemoryAccess.getDouble(addr, element*C_DOUBLE.byteSize());
+    }
+
     public static void main(String[] args) {
         int Layout;
         int transa;
@@ -54,44 +65,44 @@ public class TestBlas {
         beta = 0;
  
         try (var scope = NativeScope.unboundedScope()) {
-            var a = Cdouble.allocateArray(m*n, scope);
-            var x = Cdouble.allocateArray(n, scope);
-            var y = Cdouble.allocateArray(n, scope);
+            var a = scope.allocateArray(C_DOUBLE, m*n);
+            var x = scope.allocateArray(C_DOUBLE, n);
+            var y = scope.allocateArray(C_DOUBLE, n);
         
             /* The elements of the first column */
-            Cdouble.set(a, 0, 1.0);
-            Cdouble.set(a, 1, 2.0);
-            Cdouble.set(a, 2, 3.0);
-            Cdouble.set(a, 3, 4.0);
+            setDouble(a, 0, 1.0);
+            setDouble(a, 1, 2.0);
+            setDouble(a, 2, 3.0);
+            setDouble(a, 3, 4.0);
             /* The elements of the second column */
-            Cdouble.set(a, m, 1.0);
-            Cdouble.set(a, m + 1, 1.0);
-            Cdouble.set(a, m + 2, 1.0);
-            Cdouble.set(a, m + 3, 1.0);
+            setDouble(a, m, 1.0);
+            setDouble(a, m + 1, 1.0);
+            setDouble(a, m + 2, 1.0);
+            setDouble(a, m + 3, 1.0);
             /* The elements of the third column */
-            Cdouble.set(a, m*2, 3.0);
-            Cdouble.set(a, m*2 + 1, 4.0);
-            Cdouble.set(a, m*2 + 2, 5.0);
-            Cdouble.set(a, m*2 + 3, 6.0);
+            setDouble(a, m*2, 3.0);
+            setDouble(a, m*2 + 1, 4.0);
+            setDouble(a, m*2 + 2, 5.0);
+            setDouble(a, m*2 + 3, 6.0);
             /* The elements of the fourth column */
-            Cdouble.set(a, m*3, 5.0);
-            Cdouble.set(a, m*3 + 1, 6.0);
-            Cdouble.set(a, m*3 + 2, 7.0);
-            Cdouble.set(a, m*3 + 3, 8.0);
+            setDouble(a, m*3, 5.0);
+            setDouble(a, m*3 + 1, 6.0);
+            setDouble(a, m*3 + 2, 7.0);
+            setDouble(a, m*3 + 3, 8.0);
             /* The elemetns of x and y */
-            Cdouble.set(x, 0, 1.0);
-            Cdouble.set(x, 1, 2.0);
-            Cdouble.set(x, 2, 1.0);
-            Cdouble.set(x, 3, 1.0);
-            Cdouble.set(y, 0, 0.0);
-            Cdouble.set(y, 1, 0.0);
-            Cdouble.set(y, 2, 0.0);
-            Cdouble.set(y, 3, 0.0);
+            setDouble(x, 0, 1.0);
+            setDouble(x, 1, 2.0);
+            setDouble(x, 2, 1.0);
+            setDouble(x, 3, 1.0);
+            setDouble(y, 0, 0.0);
+            setDouble(y, 1, 0.0);
+            setDouble(y, 2, 0.0);
+            setDouble(y, 3, 0.0);
 
             cblas_dgemv(Layout, transa, m, n, alpha, a, lda, x, incx, beta, y, incy);
             /* Print y */
             for (i = 0; i < n; i++) {
-                System.out.print(String.format(" y%d = %f\n", i, Cdouble.get(y, (long)i)));
+                System.out.print(String.format(" y%d = %f\n", i, getDouble(y, i)));
             }
         }
     }
