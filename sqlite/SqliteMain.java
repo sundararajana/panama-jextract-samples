@@ -38,13 +38,6 @@ import static org.sqlite.RuntimeHelper.*;
 import static jdk.incubator.foreign.CSupport.*;
 
 public class SqliteMain {
-   private static MemoryAddress allocatePointer(MemoryAddress value, NativeScope scope) {
-        var addr = scope.allocate(C_POINTER);
-        var handle = C_POINTER.varHandle(long.class);
-        handle.set(addr, value.toRawLongValue());
-        return addr;
-   }
-
    private static MemoryAddress getPointer(MemoryAddress addr) {
        return getPointer(addr, 0);
    }
@@ -56,10 +49,12 @@ public class SqliteMain {
    public static void main(String[] args) throws Exception {
         try (var scope = NativeScope.unboundedScope()) {
             // char** errMsgPtrPtr;
-            var errMsgPtrPtr = allocatePointer(NULL, scope);
+            var errMsgPtrPtr = scope.allocate(C_POINTER);
+            MemoryAccess.setAddress(errMsgPtrPtr, 0, NULL);
 
             // sqlite3** dbPtrPtr;
-            var dbPtrPtr = allocatePointer(NULL, scope);
+            var dbPtrPtr = scope.allocate(C_POINTER);
+            MemoryAccess.setAddress(dbPtrPtr, 0, NULL);
 
             int rc = sqlite3_open(toCString("employee.db",scope), dbPtrPtr);
             if (rc != 0) {

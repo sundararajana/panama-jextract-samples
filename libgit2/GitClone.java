@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.NativeScope;
 import static com.github.git2_h.*;
@@ -36,13 +37,6 @@ import static jdk.incubator.foreign.CSupport.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 
 public class GitClone {
-    private static MemoryAddress allocatePointer(MemoryAddress value, NativeScope scope) {
-        var addr = scope.allocate(C_POINTER);
-        var handle = C_POINTER.varHandle(long.class);
-        handle.set(addr, value.toRawLongValue());
-        return addr;
-    }
-
     public static void main(String[] args) {
           if (args.length != 2) {
               System.err.println("java GitClone <url> <path>");
@@ -50,7 +44,8 @@ public class GitClone {
           }
           git_libgit2_init();
           try (var scope = NativeScope.unboundedScope()) {
-              var repo = allocatePointer(NULL, scope);
+              var repo = scope.allocate(C_POINTER);
+              MemoryAccess.setAddress(repo, 0, NULL);
               var url = toCString(args[0], scope);
               var path = toCString(args[1], scope);
               System.out.println(git_clone(repo, url, path, NULL));
