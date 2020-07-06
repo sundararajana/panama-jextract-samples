@@ -79,7 +79,7 @@ public class TestLapack {
         System.out.printf("\n %s\n", msg);
 
         for( i = 0; i < m; i++ ) {
-            for( j = 0; j < n; j++ ) System.out.printf(" %6.2f", MemoryAccess.getDouble(mat, C_DOUBLE.byteSize()*(i+j*ldm)));
+            for( j = 0; j < n; j++ ) System.out.printf(" %6.2f", MemoryAccess.getDoubleAtIndex(mat, i+j*ldm));
             System.out.printf( "\n" );
         }
     }

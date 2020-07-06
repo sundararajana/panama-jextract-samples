@@ -38,10 +38,6 @@ import static blas.cblas_h.*;
 import static jdk.incubator.foreign.CSupport.*;
 
 public class TestBlas {
-    private static double getDouble(MemoryAddress addr, int element) {
-        return MemoryAccess.getDouble(addr, element*C_DOUBLE.byteSize());
-    }
-
     public static void main(String[] args) {
         int Layout;
         int transa;
@@ -75,7 +71,7 @@ public class TestBlas {
             cblas_dgemv(Layout, transa, m, n, alpha, a, lda, x, incx, beta, y, incy);
             /* Print y */
             for (i = 0; i < n; i++) {
-                System.out.print(String.format(" y%d = %f\n", i, getDouble(y, i)));
+                System.out.print(String.format(" y%d = %f\n", i, MemoryAccess.getDoubleAtIndex(y, i)));
             }
         }
     }
