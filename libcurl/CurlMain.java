@@ -30,8 +30,8 @@
  */
 
 import static jdk.incubator.foreign.MemoryAddress.NULL;
-import static org.unix.RuntimeHelper.*;
-import static org.unix.curl_h.*;
+import static org.jextract.RuntimeHelper.*;
+import static org.jextract.curl_h.*;
 import static jdk.incubator.foreign.CSupport.*;
 
 public class CurlMain {
@@ -45,6 +45,8 @@ public class CurlMain {
                curl_easy_setopt(curl, CURLOPT_URL(), url);
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {
+                   String error = toJavaStringRestricted(curl_easy_strerror(res));
+                   System.out.println("Curl error: " + error);
                    curl_easy_cleanup(curl);
                }
            }
