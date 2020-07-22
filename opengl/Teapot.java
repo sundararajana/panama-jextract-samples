@@ -75,7 +75,7 @@ public class Teapot {
             var argc = scope.allocate(C_INT, 0);
             glutInit(argc, argc);
             glutInitDisplayMode(GLUT_DOUBLE() | GLUT_RGB() | GLUT_DEPTH());
-            glutInitWindowSize(900, 900);
+            glutInitWindowSize(500, 500);
             glutCreateWindow(CSupport.toCString("Hello Panama!", scope));
             var teapot = new Teapot(scope);
             var displayStub = glutDisplayFunc$func.allocate(teapot::display, scope);

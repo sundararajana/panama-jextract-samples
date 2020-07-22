@@ -41,7 +41,7 @@ public class PythonMain {
 
         Py_Initialize();
         try (var s = toCString(script)) {
-            var str = s.baseAddress();
+            var str = s.address();
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }

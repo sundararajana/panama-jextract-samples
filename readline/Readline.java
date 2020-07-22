@@ -36,7 +36,7 @@ import static jdk.incubator.foreign.CSupport.*;
 public class Readline {
     public static void main(String[] args) {
         try (var s = toCString("name? ")) {
-            var pstr = s.baseAddress();
+            var pstr = s.address();
             // call "readline" API
             var p = readline(pstr);
 

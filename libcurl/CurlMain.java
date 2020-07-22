@@ -41,7 +41,7 @@ public class CurlMain {
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
            try (var s = toCString(urlStr)) {
-               var url = s.baseAddress();
+               var url = s.address();
                curl_easy_setopt(curl, CURLOPT_URL(), url);
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {
