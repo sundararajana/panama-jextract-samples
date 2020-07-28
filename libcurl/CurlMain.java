@@ -40,9 +40,8 @@ public class CurlMain {
        curl_global_init(CURL_GLOBAL_DEFAULT());
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
-           try (var s = toCString(urlStr)) {
-               var url = s.address();
-               curl_easy_setopt(curl, CURLOPT_URL(), url);
+           try (var url = toCString(urlStr)) {
+               curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {
                    String error = toJavaStringRestricted(curl_easy_strerror(res));

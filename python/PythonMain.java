@@ -40,8 +40,7 @@ public class PythonMain {
         String script = "print(sum([33, 55, 66])); print('Hello from Python!')\n";
 
         Py_Initialize();
-        try (var s = toCString(script)) {
-            var str = s.address();
+        try (var str = toCString(script)) {
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }
