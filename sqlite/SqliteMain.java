@@ -96,11 +96,11 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                argv = asArrayRestricted(argv, C_POINTER, argc);
-                columnNames = asArrayRestricted(columnNames, C_POINTER, argc);
+                var argv_seg = asArrayRestricted(argv, C_POINTER, argc);
+                var columnNames_seg = asArrayRestricted(columnNames, C_POINTER, argc);
                 for (int i = 0; i < argc; i++) {
-                     String name = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(columnNames, i));
-                     String value = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(argv, i));
+                     String name = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(columnNames_seg, i));
+                     String value = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(argv_seg, i));
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;

@@ -31,6 +31,7 @@
 
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemoryAddress;
+import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.NativeScope;
 import lapack.*;
 import static lapack.lapacke_h.*;
@@ -74,7 +75,7 @@ public class TestLapack {
         }   
     }   
     
-    static void print_matrix_colmajor(String msg, int m, int n, MemoryAddress mat, int ldm) {
+    static void print_matrix_colmajor(String msg, int m, int n, MemorySegment mat, int ldm) {
         int i, j;
         System.out.printf("\n %s\n", msg);
 

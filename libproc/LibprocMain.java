@@ -48,7 +48,7 @@ public class LibprocMain {
             // list all the pids into the native array
             proc_listallpids(pids, numPids);
             // convert native array to java array
-            int[] jpids = pids.segment().toIntArray();
+            int[] jpids = pids.toIntArray();
             // buffer for process name
             var nameBuf = scope.allocateArray(CSupport.C_CHAR, NAME_BUF_MAX);
             for (int i = 0; i < jpids.length; i++) {
