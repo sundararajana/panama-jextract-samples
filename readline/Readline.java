@@ -43,6 +43,8 @@ public class Readline {
             System.out.println(p);
             // convert char* ptr from readline as Java String & print it
             System.out.println("Hello, " + toJavaStringRestricted(p));
+
+            freeMemoryRestricted(p);
         }
     }
 }
