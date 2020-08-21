@@ -59,7 +59,7 @@ public class ASTPrinter {
             var visitor = new MemorySegment[1];
 
             // clang Cursor visitor callback
-            var seg = clang_visitChildren$visitor.allocate((cursor, parent, data) -> {
+            visitor[0] = clang_visitChildren$visitor.allocate((cursor, parent, data) -> {
                 var kind = clang_getCursorKind(cursor);
                 var name = asJavaString(clang_getCursorSpelling(cursor));
                 var kindName = asJavaString(clang_getCursorKindSpelling(kind));
@@ -73,7 +73,6 @@ public class ASTPrinter {
 
                 return CXChildVisit_Continue();
             });
-            visitor[0] = seg;
 
             // get the AST root and visit it
             var root = clang_getTranslationUnitCursor(tu);
