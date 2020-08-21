@@ -47,7 +47,6 @@ public class ASTPrinter {
             System.exit(1);
         }
 
-
         // parse the C header/source passed from the command line
         var index = clang_createIndex(0, 0);
         var tu = clang_parseTranslationUnit(index, toCString(args[0]),
@@ -63,8 +62,13 @@ public class ASTPrinter {
                 var kind = clang_getCursorKind(cursor);
                 var name = asJavaString(clang_getCursorSpelling(cursor));
                 var kindName = asJavaString(clang_getCursorKindSpelling(kind));
-
-                System.out.printf("%s %s %s\n", " ".repeat(level[0]), kindName, name);
+                System.out.printf("%s %s %s", " ".repeat(level[0]), kindName, name);
+                var type = clang_getCursorType(cursor);
+                if (CXType.kind$get(type) != CXType_Invalid()) {
+                    var typeName = asJavaString(clang_getTypeSpelling(type));
+                    System.out.printf(" <%s>", typeName);
+                }
+                System.out.println();
 
                 // visit children
                 level[0]++;
