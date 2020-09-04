@@ -53,7 +53,7 @@ public class TensorflowLoadSavedModel {
 
             var savedModelDir = toCString(args[0], scope);
             var tags = scope.allocate(C_POINTER);
-            MemoryAccess.setAddressAtOffset(tags, 0, toCString("serve", scope).address());
+            MemoryAccess.setAddress(tags, toCString("serve", scope).address());
             var session = TF_LoadSessionFromSavedModel(sessionOpts, NULL, savedModelDir, tags, 1, graph, NULL, status);
 
             if (TF_GetCode(status) != TF_OK()) {
