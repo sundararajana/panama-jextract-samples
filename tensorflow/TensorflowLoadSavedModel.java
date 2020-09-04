@@ -31,9 +31,9 @@
 
 import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.MemoryAccess.*;
 import static jdk.incubator.foreign.MemoryAddress.*;
 import static org.tensorflow.c_api_h.*;
-import static org.tensorflow.RuntimeHelper.*;
 
 // simple program that loads saved model and prints basic info on operations in it
 
@@ -53,7 +53,7 @@ public class TensorflowLoadSavedModel {
 
             var savedModelDir = toCString(args[0], scope);
             var tags = scope.allocate(C_POINTER);
-            MemoryAccess.setAddress(tags, toCString("serve", scope).address());
+            setAddress(tags, toCString("serve", scope).address());
             var session = TF_LoadSessionFromSavedModel(sessionOpts, NULL, savedModelDir, tags, 1, graph, NULL, status);
 
             if (TF_GetCode(status) != TF_OK()) {
