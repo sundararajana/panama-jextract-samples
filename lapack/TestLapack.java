@@ -35,7 +35,7 @@ import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.NativeScope;
 import lapack.*;
 import static lapack.lapacke_h.*;
-import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.CLinker.*;
 
 public class TestLapack {
     public static void main(String[] args) {

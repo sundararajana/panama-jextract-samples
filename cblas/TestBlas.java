@@ -35,7 +35,7 @@ import jdk.incubator.foreign.NativeScope;
 import blas.*;
 import static blas.RuntimeHelper.*;
 import static blas.cblas_h.*;
-import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.CLinker.*;
 
 public class TestBlas {
     public static void main(String[] args) {

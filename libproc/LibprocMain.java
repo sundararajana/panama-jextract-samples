@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.CSupport;
+import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.NativeScope;
 import org.unix.*;
@@ -44,18 +44,18 @@ public class LibprocMain {
             // get the number of processes
             int numPids = proc_listallpids(NULL, 0);
             // allocate an array
-            var pids = scope.allocateArray(CSupport.C_INT, numPids);
+            var pids = scope.allocateArray(CLinker.C_INT, numPids);
             // list all the pids into the native array
             proc_listallpids(pids, numPids);
             // convert native array to java array
             int[] jpids = pids.toIntArray();
             // buffer for process name
-            var nameBuf = scope.allocateArray(CSupport.C_CHAR, NAME_BUF_MAX);
+            var nameBuf = scope.allocateArray(CLinker.C_CHAR, NAME_BUF_MAX);
             for (int i = 0; i < jpids.length; i++) {
                 int pid = jpids[i];
                 // get the process name
                 proc_name(pid, nameBuf, NAME_BUF_MAX);
-                String procName = CSupport.toJavaString(nameBuf);
+                String procName = CLinker.toJavaString(nameBuf);
                 // print pid and process name
                 System.out.printf("%d %s\n", pid, procName);
             }

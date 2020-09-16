@@ -29,8 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.CSupport;
-import static jdk.incubator.foreign.CSupport.*;
+import jdk.incubator.foreign.CLinker;
+import static jdk.incubator.foreign.CLinker.*;
 import jdk.incubator.foreign.NativeScope;
 import static opengl.glut_h.*;
 
@@ -76,7 +76,7 @@ public class Teapot {
             glutInit(argc, argc);
             glutInitDisplayMode(GLUT_DOUBLE() | GLUT_RGB() | GLUT_DEPTH());
             glutInitWindowSize(500, 500);
-            glutCreateWindow(CSupport.toCString("Hello Panama!", scope));
+            glutCreateWindow(CLinker.toCString("Hello Panama!", scope));
             var teapot = new Teapot(scope);
             var displayStub = glutDisplayFunc$func.allocate(teapot::display, scope);
             var idleStub = glutIdleFunc$func.allocate(teapot::onIdle, scope);

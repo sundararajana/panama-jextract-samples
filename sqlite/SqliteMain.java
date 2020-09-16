@@ -35,7 +35,7 @@ import jdk.incubator.foreign.NativeScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
 import static org.sqlite.RuntimeHelper.*;
-import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.CLinker.*;
 
 public class SqliteMain {
    public static void main(String[] args) throws Exception {

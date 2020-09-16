@@ -30,7 +30,7 @@
  */
 
 import static org.unix.time_h.*;
-import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.CLinker.*;
 import jdk.incubator.foreign.*;
 
 public class PanamaTime {

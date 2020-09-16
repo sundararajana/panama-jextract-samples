@@ -31,7 +31,7 @@
 
 import static org.unix.RuntimeHelper.*;
 import static org.unix.readline_h.*;
-import static jdk.incubator.foreign.CSupport.*;
+import static jdk.incubator.foreign.CLinker.*;
 
 public class Readline {
     public static void main(String[] args) {
