@@ -33,7 +33,6 @@ import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.NativeScope;
 import blas.*;
-import static blas.RuntimeHelper.*;
 import static blas.cblas_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 

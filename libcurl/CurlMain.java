@@ -30,7 +30,6 @@
  */
 
 import static jdk.incubator.foreign.MemoryAddress.NULL;
-import static org.jextract.RuntimeHelper.*;
 import static org.jextract.curl_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 

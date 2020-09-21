@@ -34,7 +34,6 @@ import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.NativeScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
-import static org.sqlite.RuntimeHelper.*;
 import static jdk.incubator.foreign.CLinker.*;
 
 public class SqliteMain {
@@ -96,8 +95,8 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                var argv_seg = asArrayRestricted(argv, C_POINTER, argc);
-                var columnNames_seg = asArrayRestricted(columnNames, C_POINTER, argc);
+                var argv_seg = argv.asSegmentRestricted(C_POINTER.byteSize() * argc);
+                var columnNames_seg = columnNames.asSegmentRestricted(C_POINTER.byteSize() * argc);
                 for (int i = 0; i < argc; i++) {
                      String name = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(columnNames_seg, i));
                      String value = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(argv_seg, i));

@@ -32,7 +32,6 @@
 import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted python 'header' class
-import static org.python.RuntimeHelper.*;
 import static org.python.Python_h.*;
 
 public class PythonMain {

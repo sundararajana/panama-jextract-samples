@@ -29,7 +29,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static org.unix.RuntimeHelper.*;
 import static org.unix.readline_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 
