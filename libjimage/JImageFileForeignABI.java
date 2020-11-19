@@ -39,17 +39,10 @@ import static jdk.incubator.foreign.CLinker.*;
 public class JImageFileForeignABI {
     private final static CLinker LINKER = CLinker.getInstance();
     private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
-    private static final LibraryLookup[] LIBRARIES = new LibraryLookup[] {
-        LibraryLookup.ofDefault() };
-
-    static final Optional<LibraryLookup.Symbol> lookup(String sym) {
-        return Stream.of(LIBRARIES)
-                .flatMap(l -> l.lookup(sym).stream())
-                .findFirst();
-    }
+    private final static LibraryLookup LOOKUP = LibraryLookup.ofDefault();
 
     static final MethodHandle downcallHandle(String name, MethodType mtype, FunctionDescriptor fdesc) {
-        return lookup(name).map(
+        return LOOKUP.lookup(name).map(
                 addr -> {
                     return LINKER.downcallHandle(addr, mtype, fdesc);
                 }).orElse(null);
