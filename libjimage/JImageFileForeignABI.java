@@ -41,28 +41,11 @@ public class JImageFileForeignABI {
     private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private final static LibraryLookup LOOKUP = LibraryLookup.ofDefault();
 
-    static final MethodHandle downcallHandle(String name, MethodType mtype, FunctionDescriptor fdesc) {
-        return LOOKUP.lookup(name).map(
-                addr -> {
-                    return LINKER.downcallHandle(addr, mtype, fdesc);
-                }).orElse(null);
-    }
-
-    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, MethodType mtype, FunctionDescriptor fdesc) {
-        try {
-            MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply", mtype);
-            handle = handle.bindTo(z);
-            return LINKER.upcallStub(handle, fdesc);
-        } catch (Throwable ex) {
-            throw new AssertionError(ex);
-        }
-    }
-
     static final FunctionDescriptor JIMAGE_OpenFUNC = FunctionDescriptor.of(
         C_POINTER, C_POINTER, C_POINTER);
 
-    static final MethodHandle JIMAGE_OpenMH = downcallHandle(
-        "JIMAGE_Open",
+    static final MethodHandle JIMAGE_OpenMH = LINKER.downcallHandle(
+        LOOKUP.lookup("JIMAGE_Open").get(),
         MethodType.methodType(MemoryAddress.class, MemoryAddress.class, MemoryAddress.class),
         JIMAGE_OpenFUNC
     );
@@ -79,8 +62,8 @@ public class JImageFileForeignABI {
         C_POINTER
     );
 
-    static final MethodHandle JIMAGE_CloseMH = downcallHandle(
-        "JIMAGE_Close",
+    static final MethodHandle JIMAGE_CloseMH = LINKER.downcallHandle(
+        LOOKUP.lookup("JIMAGE_Close").get(),
         MethodType.methodType(void.class, MemoryAddress.class),
         JIMAGE_CloseFUNC
     );
@@ -96,8 +79,8 @@ public class JImageFileForeignABI {
     static final FunctionDescriptor JIMAGE_ResourceIteratorFUNC = FunctionDescriptor.ofVoid(
         C_POINTER, C_POINTER, C_POINTER);
 
-    static final MethodHandle JIMAGE_ResourceIteratorMH = downcallHandle(
-        "JIMAGE_ResourceIterator",
+    static final MethodHandle JIMAGE_ResourceIteratorMH = LINKER.downcallHandle(
+        LOOKUP.lookup("JIMAGE_ResourceIterator").get(),
         MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class),
         JIMAGE_ResourceIteratorFUNC
     );
@@ -119,11 +102,16 @@ public class JImageFileForeignABI {
             MemoryAddress x3, MemoryAddress x4, MemoryAddress x5, MemoryAddress x6);
 
         static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi) {
-            return upcallStub(JIMAGE_ResourceIteratorVisitor.class, fi,
-                MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
-                    MemoryAddress.class, MemoryAddress.class, MemoryAddress.class,
-                    MemoryAddress.class, MemoryAddress.class),
-                JIMAGE_ResourceIteratorVisitorFUNC);
+            try {
+                MethodHandle handle = MH_LOOKUP.findVirtual(fi.getClass(), "apply",
+                    MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
+                        MemoryAddress.class, MemoryAddress.class, MemoryAddress.class,
+                        MemoryAddress.class, MemoryAddress.class));
+                handle = handle.bindTo(fi);
+                return LINKER.upcallStub(handle, JIMAGE_ResourceIteratorVisitorFUNC);
+            } catch (Throwable th) {
+                throw new AssertionError(th);
+            }
         }
 
         static  MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, NativeScope scope) {
