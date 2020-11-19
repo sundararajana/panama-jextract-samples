@@ -38,7 +38,6 @@ import static jdk.incubator.foreign.CLinker.*;
 
 public class JImageFileForeignABI {
     private final static CLinker LINKER = CLinker.getInstance();
-    private final static ClassLoader LOADER = JImageFileForeignABI.class.getClassLoader();
     private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private static final LibraryLookup[] LIBRARIES = new LibraryLookup[] {
         LibraryLookup.ofDefault() };
@@ -49,18 +48,16 @@ public class JImageFileForeignABI {
                 .findFirst();
     }
 
-    static final MethodHandle downcallHandle(String name, String desc, FunctionDescriptor fdesc) {
+    static final MethodHandle downcallHandle(String name, MethodType mtype, FunctionDescriptor fdesc) {
         return lookup(name).map(
                 addr -> {
-                    MethodType mt = MethodType.fromMethodDescriptorString(desc, LOADER);
-                    return LINKER.downcallHandle(addr, mt, fdesc);
+                    return LINKER.downcallHandle(addr, mtype, fdesc);
                 }).orElse(null);
     }
 
-    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, FunctionDescriptor fdesc, String mtypeDesc) {
+    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, FunctionDescriptor fdesc, MethodType mtype) {
         try {
-            MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply",
-                    MethodType.fromMethodDescriptorString(mtypeDesc, LOADER));
+            MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply", mtype);
             handle = handle.bindTo(z);
             return LINKER.upcallStub(handle, fdesc);
         } catch (Throwable ex) {
@@ -73,7 +70,7 @@ public class JImageFileForeignABI {
 
     static final MethodHandle JIMAGE_OpenMH = downcallHandle(
         "JIMAGE_Open",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)Ljdk/incubator/foreign/MemoryAddress;",
+        MethodType.methodType(MemoryAddress.class, MemoryAddress.class, MemoryAddress.class),
         JIMAGE_OpenFUNC
     );
 
@@ -91,7 +88,7 @@ public class JImageFileForeignABI {
 
     static final MethodHandle JIMAGE_CloseMH = downcallHandle(
         "JIMAGE_Close",
-        "(Ljdk/incubator/foreign/MemoryAddress;)V",
+        MethodType.methodType(void.class, MemoryAddress.class),
         JIMAGE_CloseFUNC
     );
 
@@ -108,7 +105,7 @@ public class JImageFileForeignABI {
 
     static final MethodHandle JIMAGE_ResourceIteratorMH = downcallHandle(
         "JIMAGE_ResourceIterator",
-        "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)V",
+        MethodType.methodType(void.class, MemoryAddress.class, MemoryAddress.class, MemoryAddress.class),
         JIMAGE_ResourceIteratorFUNC
     );
 
@@ -130,7 +127,10 @@ public class JImageFileForeignABI {
 
         static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi) {
             return upcallStub(JIMAGE_ResourceIteratorVisitor.class, fi,
-                JIMAGE_ResourceIteratorVisitorFUNC, "(Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;Ljdk/incubator/foreign/MemoryAddress;)I");
+                JIMAGE_ResourceIteratorVisitorFUNC,
+                MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
+                    MemoryAddress.class, MemoryAddress.class, MemoryAddress.class,
+                    MemoryAddress.class, MemoryAddress.class));
         }
 
         static  MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, NativeScope scope) {
