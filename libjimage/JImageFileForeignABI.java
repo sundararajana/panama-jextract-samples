@@ -55,7 +55,7 @@ public class JImageFileForeignABI {
                 }).orElse(null);
     }
 
-    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, FunctionDescriptor fdesc, MethodType mtype) {
+    static final <Z> MemorySegment upcallStub(Class<Z> fi, Z z, MethodType mtype, FunctionDescriptor fdesc) {
         try {
             MethodHandle handle = MH_LOOKUP.findVirtual(fi, "apply", mtype);
             handle = handle.bindTo(z);
@@ -127,10 +127,10 @@ public class JImageFileForeignABI {
 
         static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi) {
             return upcallStub(JIMAGE_ResourceIteratorVisitor.class, fi,
-                JIMAGE_ResourceIteratorVisitorFUNC,
                 MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
                     MemoryAddress.class, MemoryAddress.class, MemoryAddress.class,
-                    MemoryAddress.class, MemoryAddress.class));
+                    MemoryAddress.class, MemoryAddress.class),
+                JIMAGE_ResourceIteratorVisitorFUNC);
         }
 
         static  MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, NativeScope scope) {
