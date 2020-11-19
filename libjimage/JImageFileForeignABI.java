@@ -98,8 +98,8 @@ public class JImageFileForeignABI {
     );
 
     static interface JIMAGE_ResourceIteratorVisitor {
-        int apply(MemoryAddress x0, MemoryAddress x1, MemoryAddress x2,
-            MemoryAddress x3, MemoryAddress x4, MemoryAddress x5, MemoryAddress x6);
+        int apply(MemoryAddress jimage, MemoryAddress module_name, MemoryAddress version,
+            MemoryAddress package_name, MemoryAddress name, MemoryAddress extension, MemoryAddress arg);
 
         static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi) {
             try {
