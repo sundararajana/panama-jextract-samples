@@ -14,8 +14,6 @@ $jextract = find-tool("jextract")
   "-l" freeglut `
   "-t" "opengl" `
   -J-Xmx2G `
-  -J"-Djextract.log.cursors=true" `
-  -J"-Djextract.debug=true" `
   --filter 'GL' `
   --filter 'GLU' `
   "--" `

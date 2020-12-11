@@ -11,8 +11,6 @@ $jextract = find-tool("jextract")
   -t com.github `
   -I "$libgit2path\include" `
   -J-Xmx2G `
-  -J"-Djextract.log=true" `
-  -J"-Djextract.debug=true" `
   -l git2 `
   -- `
   "$libgit2path\include\git2.h"
