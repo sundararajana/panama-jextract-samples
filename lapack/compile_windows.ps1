@@ -12,8 +12,6 @@ $jextract = find-tool("jextract")
   -I "$lapackPath\include" `
   -l liblapacke `
   -J-Xmx2G `
-  -J"-Djextract.log.cursors=true" `
-  -J"-Djextract.debug=true" `
   --filter 'lapacke.h' `
   -- `
   "$lapackPath\include\lapacke.h"

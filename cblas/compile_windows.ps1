@@ -12,8 +12,6 @@ $jextract = find-tool("jextract")
   -I "$blasPath\include" `
   -l libcblas `
   -J-Xmx2G `
-  -J"-Djextract.log=true" `
-  -J"-Djextract.debug=true" `
   --filter 'cblas.h' `
   -- `
   "$blasPath\include\cblas.h"

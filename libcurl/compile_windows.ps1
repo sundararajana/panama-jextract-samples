@@ -12,8 +12,6 @@ $jextract = find-tool("jextract")
   -I "$curlpath\include" `
   -I "$curlpath\include\curl" `
   -J-Xmx2G `
-  -J"-Djextract.log.cursors=true" `
-  -J"-Djextract.debug=true" `
   -llibcurl `
   --filter 'curl' `
   -- `

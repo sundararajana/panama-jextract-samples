@@ -1,6 +1,8 @@
 param(
   [Parameter(Mandatory=$true, HelpMessage="The path python install")]
-  [string]$pythonPath
+  [string]$pythonPath,
+  [Parameter(Mandatory=$true, HelpMessage="The name of the python dll to link against. For instance 'python38', for python38.dll")]
+  [string]$pythonLibName
 )
 
 . ../shared_windows.ps1
@@ -9,10 +11,8 @@ $jextract = find-tool("jextract")
 
 & $jextract `
   -I "$pythonPath\include" `
-  "-l" python3 `
+  "-l" $pythonLibName `
   "-t" "org.python" `
   -J-Xmx2G `
-  -J"-Djextract.log=true" `
-  -J"-Djextract.debug=true" `
   "--" `
   "$pythonPath\include\Python.h"
