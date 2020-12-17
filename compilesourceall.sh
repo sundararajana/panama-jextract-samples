@@ -47,6 +47,10 @@ echo "compiling sqlite"
 cd sqlite
 sh ./compilesource.sh
 cd ..
+echo "compiling tcl"
+cd tcl
+sh ./compilesource.sh
+cd ..
 echo "compiling tensorflow"
 cd tensorflow
 sh ./compilesource.sh

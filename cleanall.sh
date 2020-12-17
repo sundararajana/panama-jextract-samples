@@ -35,6 +35,9 @@ cd ..
 cd sqlite
 rm -rf org
 cd ..
+cd tcl
+rm -rf org
+cd ..
 cd tensorflow
 rm -rf org
 cd ..
