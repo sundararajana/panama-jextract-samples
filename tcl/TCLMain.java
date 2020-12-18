@@ -29,7 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import static jdk.incubator.foreign.CLinker.*;
+import static jdk.incubator.foreign.CLinker.toCString;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted tcl 'header' class
 import static org.tcl.tcl_h.*;
@@ -54,5 +54,7 @@ public class TCLMain {
         try (var str = toCString(script)) {
             Tcl_Eval(interp, str);
         }
+
+        Tcl_DeleteInterp(interp);
     }
 }
