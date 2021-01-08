@@ -1,0 +1,3 @@
+I've installed anaconda3 under /opt/anaconda3
+
+You may have to fix shell scripts to your anaconda3 installation directory.
