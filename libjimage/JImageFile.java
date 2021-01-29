@@ -49,7 +49,7 @@ public class JImageFile {
             // const char* module_name, const char* version, const char* package,
             // const char* name, const char* extension, void* arg
 
-            var visitor = JIMAGE_ResourceIterator$visitor.allocate(
+            var visitor = JImageResourceVisitor_t.allocate(
                 (jimage, module_name, version, package_name, name, extension, arg) -> {
                    System.out.println("module " + toJavaStringRestricted(module_name));
                    System.out.println("package " + toJavaStringRestricted(package_name));

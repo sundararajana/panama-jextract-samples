@@ -57,7 +57,7 @@ public class ASTPrinter {
             var visitor = new MemorySegment[1];
 
             // clang Cursor visitor callback
-            visitor[0] = clang_visitChildren$visitor.allocate((cursor, parent, data) -> {
+            visitor[0] = CXCursorVisitor.allocate((cursor, parent, data) -> {
                 var kind = clang_getCursorKind(cursor);
                 var name = asJavaString(clang_getCursorSpelling(cursor));
                 var kindName = asJavaString(clang_getCursorKindSpelling(kind));
