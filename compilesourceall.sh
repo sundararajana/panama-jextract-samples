@@ -39,6 +39,10 @@ echo "compiling python"
 cd python
 sh ./compilesource.sh
 cd ..
+echo "compiling python3"
+cd python3
+sh ./compilesource.sh
+cd ..
 echo "compiling readline"
 cd readline
 sh ./compilesource.sh

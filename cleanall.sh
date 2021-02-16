@@ -29,11 +29,15 @@ cd ..
 cd python
 rm -rf org
 cd ..
+cd python3
+rm -rf org
+cd ..
 cd readline
 rm -rf org
 cd ..
 cd sqlite
 rm -rf org
+rm -rf employee.db
 cd ..
 cd tcl
 rm -rf org
