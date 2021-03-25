@@ -32,6 +32,7 @@
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.jextract.curl_h.*;
 import static jdk.incubator.foreign.CLinker.*;
+import org.jextract.*;
 
 public class CurlMain {
    public static void main(String[] args) {
@@ -39,7 +40,8 @@ public class CurlMain {
        curl_global_init(CURL_GLOBAL_DEFAULT());
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
-           try (var url = toCString(urlStr)) {
+           try (var scope = NativeScope.unboundedScope()) {
+               var url = toCString(urlStr, scope);
                curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {

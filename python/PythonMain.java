@@ -33,13 +33,15 @@ import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted python 'header' class
 import static org.python.Python_h.*;
+import org.python.*;
 
 public class PythonMain {
     public static void main(String[] args) {
         String script = "print(sum([33, 55, 66])); print('Hello from Python!')\n";
 
         Py_Initialize();
-        try (var str = toCString(script)) {
+        try (var scope = NativeScope.unboundedScope()) {
+            var str = toCString(script);
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }

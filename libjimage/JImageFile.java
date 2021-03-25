@@ -29,10 +29,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.NativeScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.openjdk.jimage_h.*;
 import static jdk.incubator.foreign.CLinker.*;
+import org.openjdk.NativeScope;
 
 public class JImageFile {
     public static void main(String[] args) {
@@ -55,7 +55,7 @@ public class JImageFile {
                    System.out.println("package " + toJavaStringRestricted(package_name));
                    System.out.println("name " + toJavaStringRestricted(name));
                    return 1;
-                }, scope);
+                }, scope.scope());
 
             JIMAGE_ResourceIterator(jimageFile, visitor, NULL);
 

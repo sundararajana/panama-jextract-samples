@@ -31,12 +31,15 @@
 
 import static org.unix.readline_h.*;
 import static jdk.incubator.foreign.CLinker.*;
+import org.unix.*;
 
 public class Readline {
     public static void main(String[] args) {
-        try (var str = toCString("name? ")) {
+       try (var scope = NativeScope.unboundedScope()) {
+            var url = toCString("name? ", scope);
+
             // call "readline" API
-            var p = readline(str);
+            var p = readline(url);
 
             // print char* as is
             System.out.println(p);

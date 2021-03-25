@@ -31,9 +31,9 @@
 
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.NativeScope;
 import blas.*;
 import static blas.cblas_h.*;
+import blas.NativeScope;
 import static jdk.incubator.foreign.CLinker.*;
 
 public class TestBlas {

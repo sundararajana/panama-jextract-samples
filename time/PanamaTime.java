@@ -32,6 +32,7 @@
 import static org.unix.time_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 import jdk.incubator.foreign.*;
+import org.unix.*;
 
 public class PanamaTime {
     public static void main(String[] args) {

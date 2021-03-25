@@ -31,8 +31,8 @@
 
 import jdk.incubator.foreign.CLinker;
 import static jdk.incubator.foreign.CLinker.*;
-import jdk.incubator.foreign.NativeScope;
 import static opengl.glut_h.*;
+import opengl.NativeScope;
 
 public class Teapot {
     private float rot = 0;
@@ -78,8 +78,8 @@ public class Teapot {
             glutInitWindowSize(500, 500);
             glutCreateWindow(CLinker.toCString("Hello Panama!", scope));
             var teapot = new Teapot(scope);
-            var displayStub = glutDisplayFunc$func.allocate(teapot::display, scope);
-            var idleStub = glutIdleFunc$func.allocate(teapot::onIdle, scope);
+            var displayStub = glutDisplayFunc$func.allocate(teapot::display, scope.scope());
+            var idleStub = glutIdleFunc$func.allocate(teapot::onIdle, scope.scope());
             glutDisplayFunc(displayStub);
             glutIdleFunc(idleStub);
             glutMainLoop();

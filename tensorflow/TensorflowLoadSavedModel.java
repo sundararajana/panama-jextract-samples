@@ -34,6 +34,7 @@ import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAccess.*;
 import static jdk.incubator.foreign.MemoryAddress.*;
 import static org.tensorflow.c_api_h.*;
+import org.tensorflow.*;
 
 // simple program that loads saved model and prints basic info on operations in it
 

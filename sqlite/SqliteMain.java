@@ -31,10 +31,10 @@
 
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.NativeScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
 import static jdk.incubator.foreign.CLinker.*;
+import org.sqlite.NativeScope;
 
 public class SqliteMain {
    public static void main(String[] args) throws Exception {
@@ -103,7 +103,7 @@ public class SqliteMain {
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;
-            }, scope);
+            }, scope.scope());
 
             // select query
             sql = toCString("SELECT * FROM EMPLOYEE", scope);

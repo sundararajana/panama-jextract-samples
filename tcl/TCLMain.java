@@ -33,6 +33,7 @@ import static jdk.incubator.foreign.CLinker.toCString;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted tcl 'header' class
 import static org.tcl.tcl_h.*;
+import org.tcl.*;
 
 // Sample to demonstrate embedding Tcl/Tk interpreter in Java code
 
@@ -51,7 +52,8 @@ public class TCLMain {
             puts "Full name: $name(first) $name(last)"
         """;
 
-        try (var str = toCString(script)) {
+        try (var scope = NativeScope.unboundedScope()) {
+            var str = toCString(script, scope);
             Tcl_Eval(interp, str);
         }
 

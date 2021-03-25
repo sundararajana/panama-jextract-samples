@@ -33,6 +33,7 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.llvm.clang.Index_h.*;
+import org.llvm.clang.*;
 
 public class ASTPrinter {
     private static String asJavaString(MemorySegment clangStr) {

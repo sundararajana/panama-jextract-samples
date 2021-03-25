@@ -32,7 +32,6 @@
 import jdk.incubator.foreign.MemoryAccess;
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.NativeScope;
 import lapack.*;
 import static lapack.lapacke_h.*;
 import static jdk.incubator.foreign.CLinker.*;

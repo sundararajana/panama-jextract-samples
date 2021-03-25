@@ -31,10 +31,10 @@
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemorySegment;
-import jdk.incubator.foreign.NativeScope;
 import org.unix.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.unix.libproc_h.*;
+import org.unix.NativeScope;
 
 public class LibprocMain {
     private static final int NAME_BUF_MAX = 256;
