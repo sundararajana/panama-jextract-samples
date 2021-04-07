@@ -13,7 +13,6 @@ $jextract = find-tool("jextract")
   "-l" glu32 `
   "-l" freeglut `
   "-t" "opengl" `
-  -J-Xmx2G `
   --filter 'GL' `
   --filter 'GLU' `
   "--" `

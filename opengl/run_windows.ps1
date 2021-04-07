@@ -8,7 +8,7 @@ param(
 $java = find-tool("java")
 
 & $java `
-  -D"foreign.restricted=permit" `
+  --enable-native-access=ALL-UNNAMED `
   --add-modules jdk.incubator.foreign `
   -D"java.library.path=C:\Windows\System32`;$freeglutPath\bin\x64" `
   Teapot.java
