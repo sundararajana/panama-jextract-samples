@@ -41,7 +41,7 @@ public class PythonMain {
 
         Py_Initialize();
         try (var scope = NativeScope.unboundedScope()) {
-            var str = toCString(script);
+            var str = toCString(script, scope.scope());
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }

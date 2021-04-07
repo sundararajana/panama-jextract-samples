@@ -1,3 +1,3 @@
 
-java -Dforeign.restricted=permit --add-modules jdk.incubator.foreign PanamaTime.java
+java --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.foreign PanamaTime.java
 

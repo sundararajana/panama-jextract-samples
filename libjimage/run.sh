@@ -1,4 +1,4 @@
 java -Dforeign.jrtfs.debug=true -Duse.foreign.jrtfs=true \
-   -Dforeign.restricted=permit \
+   --enable-native-access=ALL-UNNAMED \
    --add-modules jdk.incubator.foreign \
    JImageFile.java

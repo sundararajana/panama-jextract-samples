@@ -42,7 +42,7 @@ public class JImageFile {
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
 
-            var mod = toJavaStringRestricted(JIMAGE_PackageToModule(jimageFile,
+            var mod = toJavaString(JIMAGE_PackageToModule(jimageFile,
                 toCString("java/util", scope)));
             System.out.println(mod);
 
@@ -51,9 +51,9 @@ public class JImageFile {
 
             var visitor = JImageResourceVisitor_t.allocate(
                 (jimage, module_name, version, package_name, name, extension, arg) -> {
-                   System.out.println("module " + toJavaStringRestricted(module_name));
-                   System.out.println("package " + toJavaStringRestricted(package_name));
-                   System.out.println("name " + toJavaStringRestricted(name));
+                   System.out.println("module " + toJavaString(module_name));
+                   System.out.println("package " + toJavaString(package_name));
+                   System.out.println("name " + toJavaString(name));
                    return 1;
                 }, scope.scope());
 

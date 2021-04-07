@@ -40,7 +40,7 @@ import org.tensorflow.*;
 
 public class TensorflowLoadSavedModel {
     public static void main(String... args) throws Exception {
-        System.out.println("TensorFlow C library version: " + toJavaStringRestricted(TF_Version()));
+        System.out.println("TensorFlow C library version: " + toJavaString(TF_Version()));
 
         if (args.length == 0) {
             System.err.println("java TensorflowLoadSavedModel <saved model dir>");
@@ -58,7 +58,7 @@ public class TensorflowLoadSavedModel {
 
             if (TF_GetCode(status) != TF_OK()) {
                 System.err.printf("cannot load session from saved model: %s\n",
-                    toJavaStringRestricted(TF_Message(status)));
+                    toJavaString(TF_Message(status)));
             } else {
                 System.err.println("load session from saved model works!");
             }
@@ -68,8 +68,8 @@ public class TensorflowLoadSavedModel {
             var operation = NULL;
             while (!(operation = TF_GraphNextOperation(graph, size)).equals(NULL)) {
                 System.out.printf("%s : %s\n",
-                    toJavaStringRestricted(TF_OperationName(operation)),
-                    toJavaStringRestricted(TF_OperationOpType(operation)));
+                    toJavaString(TF_OperationName(operation)),
+                    toJavaString(TF_OperationOpType(operation)));
             }
 
             TF_DeleteGraph(graph);

@@ -67,7 +67,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + toJavaStringRestricted(MemoryAccess.getAddress(errMsgPtrPtr)));
+                System.err.println("SQL error: " + toJavaString(MemoryAccess.getAddress(errMsgPtrPtr)));
                 sqlite3_free(MemoryAccess.getAddress(errMsgPtrPtr));
             } else {
                 System.out.println("employee table created");
@@ -84,7 +84,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + toJavaStringRestricted(MemoryAccess.getAddress(errMsgPtrPtr)));
+                System.err.println("SQL error: " + toJavaString(MemoryAccess.getAddress(errMsgPtrPtr)));
                 sqlite3_free(MemoryAccess.getAddress(errMsgPtrPtr));
             } else {
                 System.out.println("rows inserted");
@@ -95,11 +95,11 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                var argv_seg = argv.asSegmentRestricted(C_POINTER.byteSize() * argc);
-                var columnNames_seg = columnNames.asSegmentRestricted(C_POINTER.byteSize() * argc);
+                var argv_seg = argv.asSegment(C_POINTER.byteSize() * argc, scope.scope());
+                var columnNames_seg = columnNames.asSegment(C_POINTER.byteSize() * argc, scope.scope());
                 for (int i = 0; i < argc; i++) {
-                     String name = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(columnNames_seg, i));
-                     String value = toJavaStringRestricted(MemoryAccess.getAddressAtIndex(argv_seg, i));
+                     String name = toJavaString(MemoryAccess.getAddressAtIndex(columnNames_seg, i));
+                     String value = toJavaString(MemoryAccess.getAddressAtIndex(argv_seg, i));
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;
@@ -111,7 +111,7 @@ public class SqliteMain {
 
             if (rc != 0) {
                 System.err.println("sqlite3_exec failed: " + rc);
-                System.err.println("SQL error: " + toJavaStringRestricted(MemoryAccess.getAddress(errMsgPtrPtr)));
+                System.err.println("SQL error: " + toJavaString(MemoryAccess.getAddress(errMsgPtrPtr)));
                 sqlite3_free(MemoryAccess.getAddress(errMsgPtrPtr));
             } else {
                 System.out.println("done");

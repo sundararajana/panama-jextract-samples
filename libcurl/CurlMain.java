@@ -45,7 +45,7 @@ public class CurlMain {
                curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {
-                   String error = toJavaStringRestricted(curl_easy_strerror(res));
+                   String error = toJavaString(curl_easy_strerror(res));
                    System.out.println("Curl error: " + error);
                    curl_easy_cleanup(curl);
                }

@@ -37,7 +37,7 @@ import org.llvm.clang.*;
 
 public class ASTPrinter {
     private static String asJavaString(MemorySegment clangStr) {
-        String str = toJavaStringRestricted(clang_getCString(clangStr));
+        String str = toJavaString(clang_getCString(clangStr));
         clang_disposeString(clangStr);
         return str;
     }
@@ -60,12 +60,12 @@ public class ASTPrinter {
             // clang Cursor visitor callback
             visitor[0] = CXCursorVisitor.allocate((cursor, parent, data) -> {
                 var kind = clang_getCursorKind(cursor);
-                var name = asJavaString(clang_getCursorSpelling(cursor));
-                var kindName = asJavaString(clang_getCursorKindSpelling(kind));
+                var name = asJavaString(clang_getCursorSpelling(scope.scope(), cursor));
+                var kindName = asJavaString(clang_getCursorKindSpelling(scope.scope(), kind));
                 System.out.printf("%s %s %s", " ".repeat(level[0]), kindName, name);
-                var type = clang_getCursorType(cursor);
+                var type = clang_getCursorType(scope.scope(), cursor);
                 if (CXType.kind$get(type) != CXType_Invalid()) {
-                    var typeName = asJavaString(clang_getTypeSpelling(type));
+                    var typeName = asJavaString(clang_getTypeSpelling(scope.scope(), type));
                     System.out.printf(" <%s>", typeName);
                 }
                 System.out.println();
@@ -79,7 +79,7 @@ public class ASTPrinter {
             });
 
             // get the AST root and visit it
-            var root = clang_getTranslationUnitCursor(tu);
+            var root = clang_getTranslationUnitCursor(scope.scope(), tu);
             clang_visitChildren(root, visitor[0], NULL);
 
             clang_disposeTranslationUnit(tu);
