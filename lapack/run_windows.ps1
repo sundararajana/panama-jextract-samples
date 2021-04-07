@@ -13,7 +13,7 @@ $Env:path+="`;$lapackPath\bin" # libblas.dll
 $Env:path+="`;$mingwBinPath" # mingw runtime dlls
 
 & $java `
-  -D"foreign.restricted=permit" `
+  --enable-native-access=ALL-UNNAMED `
   --add-modules jdk.incubator.foreign `
   -D"java.library.path=$lapackPath\bin" `
   TestLapack.java `

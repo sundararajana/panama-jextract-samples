@@ -13,6 +13,5 @@ $jextract = find-tool("jextract")
   -I "$pythonPath\include" `
   "-l" $pythonLibName `
   "-t" "org.python" `
-  -J-Xmx2G `
   "--" `
   "$pythonPath\include\Python.h"
