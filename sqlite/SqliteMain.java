@@ -31,10 +31,10 @@
 
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemoryAccess;
+import org.sqlite.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
 import static jdk.incubator.foreign.CLinker.*;
-import org.sqlite.NativeScope;
 
 public class SqliteMain {
    public static void main(String[] args) throws Exception {

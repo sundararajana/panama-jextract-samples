@@ -101,36 +101,32 @@ public class JImageFileForeignABI {
         int apply(MemoryAddress jimage, MemoryAddress module_name, MemoryAddress version,
             MemoryAddress package_name, MemoryAddress name, MemoryAddress extension, MemoryAddress arg);
 
-        static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi) {
+        static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, ResourceScope scope) {
             try {
                 MethodHandle handle = MH_LOOKUP.findVirtual(fi.getClass(), "apply",
                     MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,
                         MemoryAddress.class, MemoryAddress.class, MemoryAddress.class,
                         MemoryAddress.class, MemoryAddress.class));
                 handle = handle.bindTo(fi);
-                return LINKER.upcallStub(handle, JIMAGE_ResourceIteratorVisitorFUNC);
+                return LINKER.upcallStub(handle, JIMAGE_ResourceIteratorVisitorFUNC, scope);
             } catch (Throwable th) {
                 throw new AssertionError(th);
             }
-        }
-
-        static  MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, NativeScope scope) {
-            return allocate(fi).handoff(scope);
         }
     }
 
     public static void main(String[] args) throws Throwable {
         String javaHome = System.getProperty("java.home");
-        try (var scope = NativeScope.unboundedScope()) {
-            var jintResPtr = scope.allocate(C_INT, 0);
+        try (var scope = ResourceScope.newConfinedScope()) {
+            var jintResPtr = MemorySegment.allocateNative(C_INT, scope).address();
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
 
             var visitor = JIMAGE_ResourceIteratorVisitor.allocate(
                 (jimage, module_name, version, package_name, name, extension, arg) -> {
-                   System.out.println("module " + toJavaStringRestricted(module_name));
-                   System.out.println("package " + toJavaStringRestricted(package_name));
-                   System.out.println("name " + toJavaStringRestricted(name));
+                   System.out.println("module " + toJavaString(module_name));
+                   System.out.println("package " + toJavaString(package_name));
+                   System.out.println("name " + toJavaString(name));
                    return 1;
                 }, scope);
             JIMAGE_ResourceIterator(jimageFile, visitor, NULL);

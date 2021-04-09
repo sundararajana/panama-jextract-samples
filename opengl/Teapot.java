@@ -30,9 +30,9 @@
  */
 
 import jdk.incubator.foreign.CLinker;
+import opengl.*;
 import static jdk.incubator.foreign.CLinker.*;
 import static opengl.glut_h.*;
-import opengl.NativeScope;
 
 public class Teapot {
     private float rot = 0;

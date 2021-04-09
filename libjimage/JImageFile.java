@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.openjdk.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.openjdk.jimage_h.*;
 import static jdk.incubator.foreign.CLinker.*;
