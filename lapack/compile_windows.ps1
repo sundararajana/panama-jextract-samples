@@ -8,9 +8,17 @@ param(
 $jextract = find-tool("jextract")
 
 & $jextract `
+  -I "$lapackPath\include" `
+  --dump-includes 'includes_all.conf' `
+  -- `
+  "$lapackPath\include\lapacke.h"
+  
+filter_file 'includes_all.conf' 'lapacke.h' 'includes_filtered.conf'
+
+& $jextract `
   -t lapack `
   -I "$lapackPath\include" `
   -l liblapacke `
-  --filter 'lapacke.h' `
+  '@includes_filtered.conf' `
   -- `
   "$lapackPath\include\lapacke.h"
