@@ -13,7 +13,5 @@ $jextract = find-tool("jextract")
   "-l" glu32 `
   "-l" freeglut `
   "-t" "opengl" `
-  --filter 'GL' `
-  --filter 'GLU' `
   "--" `
   "$freeglutPath\include\GL\glut.h"

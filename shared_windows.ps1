@@ -16,3 +16,7 @@ function find-tool($tool) {
     exit
   }
 }
+
+function filter_file($includes_all, $pattern, $output_file) {  
+  Select-String -Path $includes_all -Pattern $pattern | %{ $_.Line } | Out-File -FilePath $output_file -Encoding ascii
+}
