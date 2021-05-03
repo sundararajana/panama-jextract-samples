@@ -30,6 +30,8 @@
  */
 
 import jdk.incubator.foreign.MemoryAddress;
+import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import static com.github.git2_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
@@ -42,8 +44,9 @@ public class GitClone {
               System.exit(1);
           }
           git_libgit2_init();
-          try (var scope = NativeScope.unboundedScope()) {
-              var repo = scope.allocate(C_POINTER);
+          try (var scope = ResourceScope.newConfinedScope()) {
+              var allocator = SegmentAllocator.ofScope(scope);
+              var repo = allocator.allocate(C_POINTER);
               var url = toCString(args[0], scope);
               var path = toCString(args[1], scope);
               System.out.println(git_clone(repo, url, path, NULL));

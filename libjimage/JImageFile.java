@@ -30,16 +30,18 @@
  */
 
 import org.openjdk.*;
+import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.openjdk.jimage_h.*;
 import static jdk.incubator.foreign.CLinker.*;
-import org.openjdk.NativeScope;
 
 public class JImageFile {
     public static void main(String[] args) {
         String javaHome = System.getProperty("java.home");
-        try (var scope = NativeScope.unboundedScope()) {
-            var jintResPtr = scope.allocate(C_INT, 0);
+        try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.ofScope(scope);
+            var jintResPtr = allocator.allocate(C_INT, 0);
             var moduleFilePath = toCString(javaHome + "/lib/modules", scope);
             var jimageFile = JIMAGE_Open(moduleFilePath, jintResPtr);
 
@@ -56,7 +58,7 @@ public class JImageFile {
                    System.out.println("package " + toJavaString(package_name));
                    System.out.println("name " + toJavaString(name));
                    return 1;
-                }, scope.scope());
+                }, scope);
 
             JIMAGE_ResourceIterator(jimageFile, visitor, NULL);
 

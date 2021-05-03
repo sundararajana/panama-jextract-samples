@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.ResourceScope;
 import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted python 'header' class
@@ -40,8 +41,8 @@ public class PythonMain {
         String script = "print(sum([33, 55, 66])); print('Hello from Python!')\n";
 
         Py_Initialize();
-        try (var scope = NativeScope.unboundedScope()) {
-            var str = toCString(script, scope.scope());
+        try (var scope = ResourceScope.newConfinedScope()) {
+            var str = toCString(script, scope);
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }

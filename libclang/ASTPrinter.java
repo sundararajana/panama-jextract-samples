@@ -48,24 +48,24 @@ public class ASTPrinter {
             System.exit(1);
         }
 
-        try (var scope = NativeScope.unboundedScope()) {
+        try (var scope = ResourceScope.newConfinedScope()) {
             // parse the C header/source passed from the command line
             var index = clang_createIndex(0, 0);
             var tu = clang_parseTranslationUnit(index, toCString(args[0], scope),
                     NULL, 0, NULL, 0, CXTranslationUnit_None());
             // array trick to update within lambda
             var level = new int[1];
-            var visitor = new MemorySegment[1];
+            var visitor = new MemoryAddress[1];
 
             // clang Cursor visitor callback
             visitor[0] = CXCursorVisitor.allocate((cursor, parent, data) -> {
                 var kind = clang_getCursorKind(cursor);
-                var name = asJavaString(clang_getCursorSpelling(scope.scope(), cursor));
-                var kindName = asJavaString(clang_getCursorKindSpelling(scope.scope(), kind));
+                var name = asJavaString(clang_getCursorSpelling(scope, cursor));
+                var kindName = asJavaString(clang_getCursorKindSpelling(scope, kind));
                 System.out.printf("%s %s %s", " ".repeat(level[0]), kindName, name);
-                var type = clang_getCursorType(scope.scope(), cursor);
+                var type = clang_getCursorType(scope, cursor);
                 if (CXType.kind$get(type) != CXType_Invalid()) {
-                    var typeName = asJavaString(clang_getTypeSpelling(scope.scope(), type));
+                    var typeName = asJavaString(clang_getTypeSpelling(scope, type));
                     System.out.printf(" <%s>", typeName);
                 }
                 System.out.println();
@@ -79,7 +79,7 @@ public class ASTPrinter {
             });
 
             // get the AST root and visit it
-            var root = clang_getTranslationUnitCursor(scope.scope(), tu);
+            var root = clang_getTranslationUnitCursor(scope, tu);
             clang_visitChildren(root, visitor[0], NULL);
 
             clang_disposeTranslationUnit(tu);

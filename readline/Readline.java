@@ -29,13 +29,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.ResourceScope;
 import static org.unix.readline_h.*;
 import static jdk.incubator.foreign.CLinker.*;
 import org.unix.*;
 
 public class Readline {
     public static void main(String[] args) {
-       try (var scope = NativeScope.unboundedScope()) {
+       try (var scope = ResourceScope.newConfinedScope()) {
             var url = toCString("name? ", scope);
 
             // call "readline" API

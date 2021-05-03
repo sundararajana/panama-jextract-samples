@@ -31,26 +31,28 @@
 
 import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemorySegment;
+import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import org.unix.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.unix.libproc_h.*;
-import org.unix.NativeScope;
 
 public class LibprocMain {
     private static final int NAME_BUF_MAX = 256;
 
     public static void main(String[] args) {
-        try (var scope = NativeScope.unboundedScope()) {
+        try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.ofScope(scope);
             // get the number of processes
             int numPids = proc_listallpids(NULL, 0);
             // allocate an array
-            var pids = scope.allocateArray(CLinker.C_INT, numPids);
+            var pids = allocator.allocateArray(CLinker.C_INT, numPids);
             // list all the pids into the native array
             proc_listallpids(pids, numPids);
             // convert native array to java array
             int[] jpids = pids.toIntArray();
             // buffer for process name
-            var nameBuf = scope.allocateArray(CLinker.C_CHAR, NAME_BUF_MAX);
+            var nameBuf = allocator.allocateArray(CLinker.C_CHAR, NAME_BUF_MAX);
             for (int i = 0; i < jpids.length; i++) {
                 int pid = jpids[i];
                 // get the process name

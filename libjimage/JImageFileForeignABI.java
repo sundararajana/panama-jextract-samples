@@ -101,7 +101,7 @@ public class JImageFileForeignABI {
         int apply(MemoryAddress jimage, MemoryAddress module_name, MemoryAddress version,
             MemoryAddress package_name, MemoryAddress name, MemoryAddress extension, MemoryAddress arg);
 
-        static MemorySegment allocate(JIMAGE_ResourceIteratorVisitor fi, ResourceScope scope) {
+        static MemoryAddress allocate(JIMAGE_ResourceIteratorVisitor fi, ResourceScope scope) {
             try {
                 MethodHandle handle = MH_LOOKUP.findVirtual(fi.getClass(), "apply",
                     MethodType.methodType(int.class, MemoryAddress.class, MemoryAddress.class,

@@ -29,6 +29,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import jdk.incubator.foreign.ResourceScope;
 import static jdk.incubator.foreign.CLinker.toCString;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted tcl 'header' class
@@ -52,7 +53,7 @@ public class TCLMain {
             puts "Full name: $name(first) $name(last)"
         """;
 
-        try (var scope = NativeScope.unboundedScope()) {
+        try (var scope = ResourceScope.newConfinedScope()) {
             var str = toCString(script, scope);
             Tcl_Eval(interp, str);
         }

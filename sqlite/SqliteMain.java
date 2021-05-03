@@ -31,6 +31,8 @@
 
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemoryAccess;
+import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import org.sqlite.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
@@ -38,12 +40,13 @@ import static jdk.incubator.foreign.CLinker.*;
 
 public class SqliteMain {
    public static void main(String[] args) throws Exception {
-        try (var scope = NativeScope.unboundedScope()) {
+        try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.ofScope(scope);
             // char** errMsgPtrPtr;
-            var errMsgPtrPtr = scope.allocate(C_POINTER);
+            var errMsgPtrPtr = allocator.allocate(C_POINTER);
 
             // sqlite3** dbPtrPtr;
-            var dbPtrPtr = scope.allocate(C_POINTER);
+            var dbPtrPtr = allocator.allocate(C_POINTER);
 
             int rc = sqlite3_open(toCString("employee.db",scope), dbPtrPtr);
             if (rc != 0) {
@@ -95,15 +98,15 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                var argv_seg = argv.asSegment(C_POINTER.byteSize() * argc, scope.scope());
-                var columnNames_seg = columnNames.asSegment(C_POINTER.byteSize() * argc, scope.scope());
+                var argv_seg = argv.asSegment(C_POINTER.byteSize() * argc, scope);
+                var columnNames_seg = columnNames.asSegment(C_POINTER.byteSize() * argc, scope);
                 for (int i = 0; i < argc; i++) {
                      String name = toJavaString(MemoryAccess.getAddressAtIndex(columnNames_seg, i));
                      String value = toJavaString(MemoryAccess.getAddressAtIndex(argv_seg, i));
                      System.out.printf("%s = %s\n", name, value);
                 }
                 return 0;
-            }, scope.scope());
+            }, scope);
 
             // select query
             sql = toCString("SELECT * FROM EMPLOYEE", scope);
