@@ -23,10 +23,6 @@ echo "compiling libgit2"
 cd libgit2
 sh ./compilesource.sh
 cd ..
-echo "compiling libjimage"
-cd libjimage
-sh ./compilesource.sh
-cd ..
 echo "compiling libproc"
 cd libproc
 sh ./compilesource.sh

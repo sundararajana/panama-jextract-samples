@@ -17,9 +17,6 @@ cd ..
 cd libgit2
 rm -rf com
 cd ..
-cd libjimage
-rm -rf org
-cd ..
 cd libproc
 rm -rf org
 cd ..
