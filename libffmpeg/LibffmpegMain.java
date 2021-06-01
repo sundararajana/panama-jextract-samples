@@ -270,13 +270,13 @@ public class LibffmpegMain {
         try (var os = Files.newOutputStream(path)) {
             System.out.println("writing " + path.toString());
             os.write(header.getBytes());
+            var data = AVFrame.data$slice(frameRGB);
+            // frameRGB.data[0]
+            var pdata = MemoryAccess.getAddressAtIndex(data, 0);
+            // frameRGB.linespace[0]
+            var linesize = MemoryAccess.getIntAtIndex(AVFrame.linesize$slice(frameRGB), 0);
             // Write pixel data
             for (int y = 0; y < height; y++) {
-                var data = AVFrame.data$slice(frameRGB);
-                // frameRGB.data[0]
-                var pdata = MemoryAccess.getAddressAtIndex(data, 0);
-                // frameRGB.linespace[0]
-                var linesize = MemoryAccess.getIntAtIndex(AVFrame.linesize$slice(frameRGB), 0);
                 // frameRGB.data[0] + y*frameRGB.linesize[0] is the pointer. And 3*width size of data
                 var pixelArray = pdata.addOffset(y*linesize).asSegment(3*width, scope);
                 // dump the pixel byte buffer to file
