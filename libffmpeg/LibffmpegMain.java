@@ -68,6 +68,13 @@ public class LibffmpegMain {
 
         av_register_all();
 
+        int exitCode = 0;
+        var pCodecCtxOrig = NULL;
+        var pCodecCtx = NULL;
+        var pFrame = NULL;
+        var pFrameRGB = NULL;
+        var buffer = NULL;
+
         try (var scope = ResourceScope.newConfinedScope()) {
             // AVFormatContext *ppFormatCtx;
             var ppFormatCtx = MemorySegment.allocateNative(C_POINTER, scope);
@@ -84,8 +91,13 @@ public class LibffmpegMain {
 
             // Retrieve stream info
             if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
-                closeAndExit(ppFormatCtx, 1, "Could not find stream information");
+                throw new ExitException(1, "Could not find stream information");
             }
+
+            scope.addCloseAction(()-> {
+                // Close the video file
+                avformat_close_input(ppFormatCtx);
+            });
 
             // Dump AV format info on stderr
             av_dump_format(pFormatCtx, 0, fileName, 0);
@@ -111,7 +123,7 @@ public class LibffmpegMain {
                 // AVStream stream;
                 var stream = pStream.asSegment(AVStream.sizeof(), scope);
                 // AVCodecContext* pCodecCtx;
-                var pCodecCtx = AVStream.codec$get(stream);
+                pCodecCtx = AVStream.codec$get(stream);
                 var avcodecCtx = pCodecCtx.asSegment(AVCodecContext.sizeof(), scope);
                 if (AVCodecContext.codec_type$get(avcodecCtx) == AVMEDIA_TYPE_VIDEO()) {
                     videoStream = i;
@@ -123,72 +135,43 @@ public class LibffmpegMain {
             }
 
             if (videoStream == -1) {
-                closeAndExit(ppFormatCtx, 1, "Didn't find a video stream");
+                throw new ExitException(1, "Didn't find a video stream");
             } else {
                 System.out.println("Found video stream (index: " + videoStream + ")");
             }
 
             if (pCodec.equals(NULL)) {
-                closeAndExit(ppFormatCtx, 1, "Unsupported codec");
+                throw new ExitException(1, "Unsupported codec");
             }
 
             // Copy context
             // AVCodecContext *pCodecCtxOrig;
-            var pCodecCtxOrig = pVideoCodecCtx;
+            pCodecCtxOrig = pVideoCodecCtx;
             // AVCodecContext *pCodecCtx;
-            var pCodecCtx = avcodec_alloc_context3(pCodec);
+            pCodecCtx = avcodec_alloc_context3(pCodec);
             if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
-                closeAndExit(ppFormatCtx, 1, "Cannot copy context");
+                throw new ExitException(1, "Cannot copy context");
             }
 
             // Open codec
             if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-                closeAndExit(ppFormatCtx, 1, "Cannot open codec");
+                throw new ExitException(1, "Cannot open codec");
             }
 
             // Allocate video frame
             // AVFrame* pFrame;
-            var pFrame = av_frame_alloc();
+            pFrame = av_frame_alloc();
             // Allocate an AVFrame structure
             // AVFrame* pFrameRGB;
-            var pFrameRGB = av_frame_alloc();
+            pFrameRGB = av_frame_alloc();
 
             // Determine required buffer size and allocate buffer
             var codecCtx = pCodecCtx.asSegment(AVCodecContext.sizeof(), scope);
             int width = AVCodecContext.width$get(codecCtx);
             int height = AVCodecContext.height$get(codecCtx);
             int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24(), width, height);
-            var buffer = av_malloc(numBytes * C_CHAR.byteSize());
+            buffer = av_malloc(numBytes * C_CHAR.byteSize());
 
-            scope.addCloseAction(()-> {
-                // clean-up everything
-
-                // Free the RGB image
-                if (!buffer.equals(NULL)) {
-                    av_free(buffer);
-                }
-
-                if (!pFrameRGB.equals(NULL)) {
-                    av_free(pFrameRGB);
-                }
-
-                // Free the YUV frame
-                if (!pFrame.equals(NULL)) {
-                    av_free(pFrame);
-                }
-
-                // Close the codecs
-                if (!pCodecCtx.equals(NULL)) {
-                    avcodec_close(pCodecCtx);
-                }
-
-                if (!pCodecCtxOrig.equals(NULL)) {
-                    avcodec_close(pCodecCtxOrig);
-                }
-
-                // Close the video file
-                avformat_close_input(ppFormatCtx);
-            });
 
             if (pFrame.equals(NULL)) {
                 throw new ExitException(1, "Cannot allocate frame");
@@ -252,14 +235,35 @@ public class LibffmpegMain {
             throw new ExitException(0, "Goodbye!");
         } catch (ExitException ee) {
             System.err.println(ee.getMessage());
-            System.exit(ee.exitCode);
-        }
-    }
+            exitCode = ee.exitCode;
+        } finally {
+            // clean-up everything
 
-    private static void closeAndExit(Addressable ppFrameCtx, int exitCode, String msg) {
-        // Close the video file
-        avformat_close_input(ppFrameCtx);
-        throw new ExitException(exitCode, msg);
+            // Free the RGB image
+            if (!buffer.equals(NULL)) {
+                av_free(buffer);
+            }
+
+            if (!pFrameRGB.equals(NULL)) {
+                av_free(pFrameRGB);
+            }
+
+            // Free the YUV frame
+            if (!pFrame.equals(NULL)) {
+                av_free(pFrame);
+            }
+
+            // Close the codecs
+            if (!pCodecCtx.equals(NULL)) {
+                avcodec_close(pCodecCtx);
+            }
+
+            if (!pCodecCtxOrig.equals(NULL)) {
+                avcodec_close(pCodecCtxOrig);
+            }
+        }
+
+        System.exit(exitCode);
     }
 
     private static void saveFrame(MemorySegment frameRGB, ResourceScope scope,
