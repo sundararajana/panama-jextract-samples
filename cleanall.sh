@@ -14,6 +14,9 @@ cd ..
 cd libcurl
 rm -rf org
 cd ..
+cd libffmpeg
+rm -rf libffmpeg
+cd ..
 cd libgit2
 rm -rf com
 cd ..

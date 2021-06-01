@@ -19,6 +19,10 @@ echo "compiling libcurl"
 cd libcurl
 sh ./compilesource.sh
 cd ..
+echo "compiling libffmpeg"
+cd libffmpeg
+sh ./compilesource.sh
+cd ..
 echo "compiling libgit2"
 cd libgit2
 sh ./compilesource.sh
