@@ -76,8 +76,7 @@ public class LibffmpegMain {
 
             // open video file
             if (avformat_open_input(ppFormatCtx, fileName, NULL, NULL) != 0) {
-                System.err.println("cannot open " + args[0]);
-                System.exit(1);
+                throw new ExitException(1, "Cannot open " + args[0]);
             }
             System.out.println("opened " + args[0]);
             // AVFormatContext *pFormatCtx;
@@ -85,7 +84,7 @@ public class LibffmpegMain {
 
             // Retrieve stream info
             if (avformat_find_stream_info(pFormatCtx, NULL) < 0) {
-                throw new ExitException(1, "Could not find stream information");
+                closeAndExit(ppFormatCtx, 1, "Could not find stream information");
             }
 
             // Dump AV format info on stderr
@@ -124,13 +123,13 @@ public class LibffmpegMain {
             }
 
             if (videoStream == -1) {
-                throw new ExitException(1, "Didn't find a video stream");
+                closeAndExit(ppFormatCtx, 1, "Didn't find a video stream");
             } else {
                 System.out.println("Found video stream (index: " + videoStream + ")");
             }
 
             if (pCodec.equals(NULL)) {
-                throw new ExitException(1, "Unsupported codec");
+                closeAndExit(ppFormatCtx, 1, "Unsupported codec");
             }
 
             // Copy context
@@ -139,25 +138,20 @@ public class LibffmpegMain {
             // AVCodecContext *pCodecCtx;
             var pCodecCtx = avcodec_alloc_context3(pCodec);
             if (avcodec_copy_context(pCodecCtx, pCodecCtxOrig) != 0) {
-                throw new ExitException(1, "Cannot copy context");
+                closeAndExit(ppFormatCtx, 1, "Cannot copy context");
             }
 
             // Open codec
             if (avcodec_open2(pCodecCtx, pCodec, NULL) < 0) {
-                throw new ExitException(1, "Cannot open codec");
+                closeAndExit(ppFormatCtx, 1, "Cannot open codec");
             }
 
             // Allocate video frame
             // AVFrame* pFrame;
             var pFrame = av_frame_alloc();
-            var frame = pFrame.asSegment(AVFrame.sizeof(), scope);
             // Allocate an AVFrame structure
             // AVFrame* pFrameRGB;
             var pFrameRGB = av_frame_alloc();
-            if (pFrameRGB.equals(NULL)) {
-                throw new ExitException(1, "Cannot allocate RGB frame");
-            }
-            var frameRGB = pFrameRGB.asSegment(AVFrame.sizeof(), scope);
 
             // Determine required buffer size and allocate buffer
             var codecCtx = pCodecCtx.asSegment(AVCodecContext.sizeof(), scope);
@@ -165,6 +159,48 @@ public class LibffmpegMain {
             int height = AVCodecContext.height$get(codecCtx);
             int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24(), width, height);
             var buffer = av_malloc(numBytes * C_CHAR.byteSize());
+
+            scope.addCloseAction(()-> {
+                // clean-up everything
+
+                // Free the RGB image
+                if (!buffer.equals(NULL)) {
+                    av_free(buffer);
+                }
+
+                if (!pFrameRGB.equals(NULL)) {
+                    av_free(pFrameRGB);
+                }
+
+                // Free the YUV frame
+                if (!pFrame.equals(NULL)) {
+                    av_free(pFrame);
+                }
+
+                // Close the codecs
+                if (!pCodecCtx.equals(NULL)) {
+                    avcodec_close(pCodecCtx);
+                }
+
+                if (!pCodecCtxOrig.equals(NULL)) {
+                    avcodec_close(pCodecCtxOrig);
+                }
+
+                // Close the video file
+                avformat_close_input(ppFormatCtx);
+            });
+
+            if (pFrame.equals(NULL)) {
+                throw new ExitException(1, "Cannot allocate frame");
+            }
+            var frame = pFrame.asSegment(AVFrame.sizeof(), scope);
+            if (pFrameRGB.equals(NULL)) {
+                throw new ExitException(1, "Cannot allocate RGB frame");
+            }
+            var frameRGB = pFrameRGB.asSegment(AVFrame.sizeof(), scope);
+            if (buffer.equals(NULL)) {
+                throw new ExitException(1, "cannot allocate buffer");
+            }
 
             // Assign appropriate parts of buffer to image planes in pFrameRGB
             // Note that pFrameRGB is an AVFrame, but AVFrame is a superset
@@ -201,9 +237,9 @@ public class LibffmpegMain {
                         if (++i <= NUM_FRAMES_TO_CAPTURE) {
                             try {
                                 saveFrame(frameRGB, scope, width, height, i);
-                            } catch (IOException exp) {
+                            } catch (Exception exp) {
                                 exp.printStackTrace();
-                                throw new ExitException(1, "file writing failed for frame " + i);
+                                throw new ExitException(1, "save frame failed for frame " + i);
                             }
                         }
                      }
@@ -213,43 +249,17 @@ public class LibffmpegMain {
                  av_free_packet(packet);
             }
 
-            scope.addCloseAction(()-> {
-                // clean-up everything
-
-                // Free the RGB image
-                if (!buffer.equals(NULL)) {
-                    av_free(buffer);
-                }
-
-                if (!pFrameRGB.equals(NULL)) {
-                    av_free(pFrameRGB);
-                }
-
-                // Free the YUV frame
-                if (!pFrame.equals(NULL)) {
-                    av_free(pFrame);
-                }
-
-                // Close the codecs
-                if (!pCodecCtx.equals(NULL)) {
-                    avcodec_close(pCodecCtx);
-                }
-
-                if (!pCodecCtxOrig.equals(NULL)) {
-                    avcodec_close(pCodecCtxOrig);
-                }
-
-                // Close the video file
-                if (!pFormatCtx.equals(NULL)) {
-                    avformat_close_input(ppFormatCtx);
-                }
-            });
-
-            throw new ExitException(0, "Good bye!");
+            throw new ExitException(0, "Goodbye!");
         } catch (ExitException ee) {
             System.err.println(ee.getMessage());
             System.exit(ee.exitCode);
         }
+    }
+
+    private static void closeAndExit(Addressable ppFrameCtx, int exitCode, String msg) {
+        // Close the video file
+        avformat_close_input(ppFrameCtx);
+        throw new ExitException(exitCode, msg);
     }
 
     private static void saveFrame(MemorySegment frameRGB, ResourceScope scope,
