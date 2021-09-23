@@ -30,8 +30,6 @@
  */
 
 import jdk.incubator.foreign.*;
-import static jdk.incubator.foreign.CLinker.*;
-import static jdk.incubator.foreign.MemoryAccess.*;
 import static jdk.incubator.foreign.MemoryAddress.*;
 import static org.tensorflow.c_api_h.*;
 import org.tensorflow.*;
@@ -40,7 +38,7 @@ import org.tensorflow.*;
 
 public class TensorflowLoadSavedModel {
     public static void main(String... args) throws Exception {
-        System.out.println("TensorFlow C library version: " + toJavaString(TF_Version()));
+        System.out.println("TensorFlow C library version: " + TF_Version().getUtf8String(0));
 
         if (args.length == 0) {
             System.err.println("java TensorflowLoadSavedModel <saved model dir>");
@@ -48,29 +46,28 @@ public class TensorflowLoadSavedModel {
         }
 
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.ofScope(scope);
             var graph = TF_NewGraph();
             var status = TF_NewStatus();
             var sessionOpts = TF_NewSessionOptions();
 
-            var savedModelDir = toCString(args[0], scope);
-            var tags = allocator.allocate(C_POINTER, toCString("serve", scope));
+            var savedModelDir = scope.allocateUtf8String(args[0]);
+            var tags = scope.allocate(C_POINTER, scope.allocateUtf8String("serve"));
             var session = TF_LoadSessionFromSavedModel(sessionOpts, NULL, savedModelDir, tags, 1, graph, NULL, status);
 
             if (TF_GetCode(status) != TF_OK()) {
                 System.err.printf("cannot load session from saved model: %s\n",
-                    toJavaString(TF_Message(status)));
+                    TF_Message(status).getUtf8String(0));
             } else {
                 System.err.println("load session from saved model works!");
             }
 
             // print operations
-            var size = allocator.allocate(C_LONG_LONG);
+            var size = scope.allocate(C_LONG_LONG);
             var operation = NULL;
             while (!(operation = TF_GraphNextOperation(graph, size)).equals(NULL)) {
                 System.out.printf("%s : %s\n",
-                    toJavaString(TF_OperationName(operation)),
-                    toJavaString(TF_OperationOpType(operation)));
+                    TF_OperationName(operation).getUtf8String(0),
+                    TF_OperationOpType(operation).getUtf8String(0));
             }
 
             TF_DeleteGraph(graph);

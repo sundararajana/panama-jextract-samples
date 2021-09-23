@@ -30,7 +30,6 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
-import static jdk.incubator.foreign.CLinker.toCString;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted tcl 'header' class
 import static org.tcl.tcl_h.*;
@@ -54,7 +53,7 @@ public class TCLMain {
         """;
 
         try (var scope = ResourceScope.newConfinedScope()) {
-            var str = toCString(script, scope);
+            var str = scope.allocateUtf8String(script);
             Tcl_Eval(interp, str);
         }
 

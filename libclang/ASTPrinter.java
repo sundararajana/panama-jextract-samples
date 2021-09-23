@@ -30,14 +30,13 @@
  */
 
 import jdk.incubator.foreign.*;
-import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.llvm.clang.Index_h.*;
 import org.llvm.clang.*;
 
 public class ASTPrinter {
     private static String asJavaString(MemorySegment clangStr) {
-        String str = toJavaString(clang_getCString(clangStr));
+        String str = clang_getCString(clangStr).getUtf8String(0);
         clang_disposeString(clangStr);
         return str;
     }
@@ -51,11 +50,11 @@ public class ASTPrinter {
         try (var scope = ResourceScope.newConfinedScope()) {
             // parse the C header/source passed from the command line
             var index = clang_createIndex(0, 0);
-            var tu = clang_parseTranslationUnit(index, toCString(args[0], scope),
+            var tu = clang_parseTranslationUnit(index, scope.allocateUtf8String(args[0]),
                     NULL, 0, NULL, 0, CXTranslationUnit_None());
             // array trick to update within lambda
             var level = new int[1];
-            var visitor = new MemoryAddress[1];
+            var visitor = new CLinker.UpcallStub[1];
 
             // clang Cursor visitor callback
             visitor[0] = CXCursorVisitor.allocate((cursor, parent, data) -> {

@@ -31,13 +31,12 @@
 
 import jdk.incubator.foreign.ResourceScope;
 import static org.unix.readline_h.*;
-import static jdk.incubator.foreign.CLinker.*;
 import org.unix.*;
 
 public class Readline {
     public static void main(String[] args) {
        try (var scope = ResourceScope.newConfinedScope()) {
-            var url = toCString("name? ", scope);
+            var url = scope.allocateUtf8String("name? ");
 
             // call "readline" API
             var p = readline(url);
@@ -45,9 +44,7 @@ public class Readline {
             // print char* as is
             System.out.println(p);
             // convert char* ptr from readline as Java String & print it
-            System.out.println("Hello, " + toJavaString(p));
-
-            freeMemory(p);
+            System.out.println("Hello, " + p.getUtf8String(0));
         }
     }
 }

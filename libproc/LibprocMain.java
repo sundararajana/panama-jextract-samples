@@ -29,10 +29,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.CLinker;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
-import jdk.incubator.foreign.SegmentAllocator;
 import org.unix.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.unix.libproc_h.*;
@@ -42,22 +40,21 @@ public class LibprocMain {
 
     public static void main(String[] args) {
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.ofScope(scope);
             // get the number of processes
             int numPids = proc_listallpids(NULL, 0);
             // allocate an array
-            var pids = allocator.allocateArray(CLinker.C_INT, numPids);
+            var pids = scope.allocateArray(C_INT, numPids);
             // list all the pids into the native array
             proc_listallpids(pids, numPids);
             // convert native array to java array
-            int[] jpids = pids.toIntArray();
+            int[] jpids = pids.toArray(C_INT);
             // buffer for process name
-            var nameBuf = allocator.allocateArray(CLinker.C_CHAR, NAME_BUF_MAX);
+            var nameBuf = scope.allocateArray(C_CHAR, NAME_BUF_MAX);
             for (int i = 0; i < jpids.length; i++) {
                 int pid = jpids[i];
                 // get the process name
                 proc_name(pid, nameBuf, NAME_BUF_MAX);
-                String procName = CLinker.toJavaString(nameBuf);
+                String procName = nameBuf.getUtf8String(0);
                 // print pid and process name
                 System.out.printf("%d %s\n", pid, procName);
             }

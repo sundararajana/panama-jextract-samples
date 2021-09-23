@@ -32,7 +32,6 @@
 import jdk.incubator.foreign.ResourceScope;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.jextract.curl_h.*;
-import static jdk.incubator.foreign.CLinker.*;
 import org.jextract.*;
 
 public class CurlMain {
@@ -42,11 +41,11 @@ public class CurlMain {
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
            try (var scope = ResourceScope.newConfinedScope()) {
-               var url = toCString(urlStr, scope);
+               var url = scope.allocateUtf8String(urlStr);
                curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {
-                   String error = toJavaString(curl_easy_strerror(res));
+                   String error = curl_easy_strerror(res).getUtf8String(0);
                    System.out.println("Curl error: " + error);
                    curl_easy_cleanup(curl);
                }

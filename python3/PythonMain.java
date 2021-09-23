@@ -30,7 +30,6 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
-import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted python 'header' class
 import static org.python.Python_h.*;
@@ -42,7 +41,7 @@ public class PythonMain {
 
         Py_Initialize();
         try (var scope = ResourceScope.newConfinedScope()) {
-            var str = toCString(script, scope);
+            var str = scope.allocateUtf8String(script);
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
         }

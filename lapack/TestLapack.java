@@ -29,25 +29,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import jdk.incubator.foreign.MemoryAccess;
-import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
-import jdk.incubator.foreign.SegmentAllocator;
 import lapack.*;
 import static lapack.lapacke_h.*;
-import static jdk.incubator.foreign.CLinker.*;
 
 public class TestLapack {
     public static void main(String[] args) {
 
         /* Locals */
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.ofScope(scope);
-            var A = allocator.allocateArray(C_DOUBLE, new double[]{
+            var A = scope.allocateArray(C_DOUBLE, new double[]{
                     1, 2, 3, 4, 5, 1, 3, 5, 2, 4, 1, 4, 2, 5, 3
             });
-            var b = allocator.allocateArray(C_DOUBLE, new double[]{
+            var b = scope.allocateArray(C_DOUBLE, new double[]{
                     -10, 12, 14, 16, 18, -3, 14, 12, 16, 16
             });
             int info, m, n, lda, ldb, nrhs;
@@ -82,7 +77,7 @@ public class TestLapack {
         System.out.printf("\n %s\n", msg);
 
         for( i = 0; i < m; i++ ) {
-            for( j = 0; j < n; j++ ) System.out.printf(" %6.2f", MemoryAccess.getDoubleAtIndex(mat, i+j*ldm));
+            for( j = 0; j < n; j++ ) System.out.printf(" %6.2f", mat.getAtIndex(C_DOUBLE, i+j*ldm));
             System.out.printf( "\n" );
         }
     }
