@@ -1,6 +1,10 @@
 cd cblas
 rm -rf blas
 cd ..
+cd dlopen
+rm -rf org
+rm -rf libhello.dylib
+cd ..
 cd helloworld
 rm -rf org
 rm -rf libhelloworld.dylib

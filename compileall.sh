@@ -3,6 +3,10 @@ echo "compiling cblas"
 cd cblas
 sh ./compile.sh
 cd ..
+echo "compiling dlopen"
+cd dlopen
+sh ./compile.sh
+cd ..
 echo "compiling helloworld"
 cd helloworld
 sh ./compile.sh
