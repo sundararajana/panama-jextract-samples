@@ -42,6 +42,9 @@ public class Dlopen {
             // load the shared object
             var helloLib = dlopen(scope.allocateUtf8String(libName), RTLD_LOCAL());
 
+            // close the shared object on resource scope close
+            scope.addCloseAction(() -> dlclose(helloLib));
+
             var linker = CLinker.systemCLinker();
             // get method handle for a function from helloLIb
             var greetingMH = linker.downcallHandle(
@@ -51,8 +54,6 @@ public class Dlopen {
             // invoke a function from helloLib
             greetingMH.invoke(scope.allocateUtf8String(arg));
 
-            // done with the shared object. close it.
-            dlclose(helloLib);
         }
     }
 }
