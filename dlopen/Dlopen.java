@@ -30,30 +30,45 @@
  */
 
 import java.lang.invoke.*;
+import java.util.Optional;
 import jdk.incubator.foreign.*;
 import org.unix.dlfcn_h.*;
 import static org.unix.dlfcn_h.*;
 
 public class Dlopen {
+    // implementation of SymbolLookup that loads a given shared object using dlopen
+    // and looks up symbols using dlsym
+    private static SymbolLookup lookup(String libraryName, ResourceScope scope) {
+        try (ResourceScope openScope = ResourceScope.newConfinedScope()) {
+            final MemoryAddress handle = dlopen(openScope.allocateUtf8String(libraryName), RTLD_LOCAL());
+            if (handle == MemoryAddress.NULL) {
+                throw new IllegalArgumentException("Cannot find library: " + libraryName);
+            }
+            scope.addCloseAction(() -> dlclose(handle));
+            return name -> {
+                try (ResourceScope lookupScope = ResourceScope.newConfinedScope()) {
+                    MemoryAddress sym = dlsym(handle, lookupScope.allocateUtf8String(name));
+                    return sym == MemoryAddress.NULL ?
+                            Optional.empty() : Optional.of(sym);
+                }
+            };
+        }
+    }
+
     public static void main(String[] args) throws Throwable {
         var arg = args.length > 0? args[0] : "Java";
         var libName = "libhello.dylib";
         try (var scope = ResourceScope.newConfinedScope()) {
-            // load the shared object
-            var helloLib = dlopen(scope.allocateUtf8String(libName), RTLD_LOCAL());
-
-            // close the shared object on resource scope close
-            scope.addCloseAction(() -> dlclose(helloLib));
+            var symLookup = lookup(libName, scope);
 
             var linker = CLinker.systemCLinker();
             // get method handle for a function from helloLIb
             var greetingMH = linker.downcallHandle(
-                dlsym(helloLib, scope.allocateUtf8String("greeting")),
+                symLookup.lookup("greeting").get(),
                 FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
             // invoke a function from helloLib
             greetingMH.invoke(scope.allocateUtf8String(arg));
-
         }
     }
 }
