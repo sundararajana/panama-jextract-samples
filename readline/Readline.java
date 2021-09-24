@@ -45,6 +45,9 @@ public class Readline {
             System.out.println(p);
             // convert char* ptr from readline as Java String & print it
             System.out.println("Hello, " + p.getUtf8String(0));
+
+            // pointer returned by readline has to be 'free'd
+            free(p);
         }
     }
 }
