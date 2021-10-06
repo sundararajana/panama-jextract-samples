@@ -46,11 +46,9 @@ public class Dlopen {
             }
             scope.addCloseAction(() -> dlclose(handle));
             return name -> {
-                try (ResourceScope lookupScope = ResourceScope.newConfinedScope()) {
-                    MemoryAddress sym = dlsym(handle, lookupScope.allocateUtf8String(name));
-                    return sym == MemoryAddress.NULL ?
-                            Optional.empty() : Optional.of(sym);
-                }
+                MemoryAddress addr = dlsym(handle, scope.allocateUtf8String(name));
+                return addr == MemoryAddress.NULL ?
+                            Optional.empty() : Optional.of(NativeSymbol.ofAddress(name, addr, scope));
             };
         }
     }

@@ -54,7 +54,7 @@ public class ASTPrinter {
                     NULL, 0, NULL, 0, CXTranslationUnit_None());
             // array trick to update within lambda
             var level = new int[1];
-            var visitor = new CLinker.UpcallStub[1];
+            var visitor = new NativeSymbol[1];
 
             // clang Cursor visitor callback
             visitor[0] = CXCursorVisitor.allocate((cursor, parent, data) -> {
@@ -75,7 +75,7 @@ public class ASTPrinter {
                 level[0]--;
 
                 return CXChildVisit_Continue();
-            });
+            }, scope);
 
             // get the AST root and visit it
             var root = clang_getTranslationUnitCursor(scope, tu);
