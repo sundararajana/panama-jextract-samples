@@ -21,6 +21,9 @@ cd ..
 cd libffmpeg
 rm -rf libffmpeg
 cd ..
+cd libjimage
+rm -rf build
+cd ..
 cd libgit2
 rm -rf com
 cd ..
