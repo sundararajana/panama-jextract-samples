@@ -30,6 +30,7 @@
  */
 
 import jdk.incubator.foreign.MemoryAddress;
+import jdk.incubator.foreign.SegmentAllocator;
 import jdk.incubator.foreign.ResourceScope;
 import blas.*;
 import static blas.cblas_h.*;
@@ -54,16 +55,17 @@ public class TestBlas {
         beta = 0;
  
         try (var scope = ResourceScope.newConfinedScope()) {
-            var a = scope.allocateArray(C_DOUBLE, new double[] {
+            var allocator = SegmentAllocator.newNativeArena(scope);
+            var a = allocator.allocateArray(C_DOUBLE, new double[] {
                 1.0, 2.0, 3.0, 4.0,
                 1.0, 1.0, 1.0, 1.0,
                 3.0, 4.0, 5.0, 6.0,
                 5.0, 6.0, 7.0, 8.0
             });
-            var x = scope.allocateArray(C_DOUBLE, new double[] {
+            var x = allocator.allocateArray(C_DOUBLE, new double[] {
                 1.0, 2.0, 1.0, 1.0
             });
-            var y = scope.allocateArray(C_DOUBLE, n);
+            var y = allocator.allocateArray(C_DOUBLE, n);
         
             cblas_dgemv(Layout, transa, m, n, alpha, a, lda, x, incx, beta, y, incy);
             /* Print y */

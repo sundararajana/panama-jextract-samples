@@ -40,13 +40,15 @@ public class Dlopen {
     // and looks up symbols using dlsym
     private static SymbolLookup lookup(String libraryName, ResourceScope scope) {
         try (ResourceScope openScope = ResourceScope.newConfinedScope()) {
-            final MemoryAddress handle = dlopen(openScope.allocateUtf8String(libraryName), RTLD_LOCAL());
+            var openScopeAllocator = SegmentAllocator.newNativeArena(openScope);
+            var handle = dlopen(openScopeAllocator.allocateUtf8String(libraryName), RTLD_LOCAL());
             if (handle == MemoryAddress.NULL) {
                 throw new IllegalArgumentException("Cannot find library: " + libraryName);
             }
             scope.addCloseAction(() -> dlclose(handle));
             return name -> {
-                MemoryAddress addr = dlsym(handle, scope.allocateUtf8String(name));
+                var allocator = SegmentAllocator.newNativeArena(scope);
+                var addr = dlsym(handle, allocator.allocateUtf8String(name));
                 return addr == MemoryAddress.NULL ?
                             Optional.empty() : Optional.of(NativeSymbol.ofAddress(name, addr, scope));
             };
@@ -57,6 +59,7 @@ public class Dlopen {
         var arg = args.length > 0? args[0] : "Java";
         var libName = "libhello.dylib";
         try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.newNativeArena(scope);
             var symLookup = lookup(libName, scope);
 
             var linker = CLinker.systemCLinker();
@@ -66,7 +69,7 @@ public class Dlopen {
                 FunctionDescriptor.ofVoid(ValueLayout.ADDRESS));
 
             // invoke a function from helloLib
-            greetingMH.invoke(scope.allocateUtf8String(arg));
+            greetingMH.invoke(allocator.allocateUtf8String(arg));
         }
     }
 }

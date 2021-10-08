@@ -30,24 +30,25 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import opengl.*;
 import static opengl.glut_h.*;
 
 public class Teapot {
     private float rot = 0;
 
-    Teapot(ResourceScope scope) {
+    Teapot(SegmentAllocator allocator) {
         // Reset Background
         glClearColor(0f, 0f, 0f, 0f);
         // Setup Lighting
         glShadeModel(GL_SMOOTH());
-        var pos = scope.allocateArray(C_FLOAT, new float[] {0.0f, 15.0f, -15.0f, 0});
+        var pos = allocator.allocateArray(C_FLOAT, new float[] {0.0f, 15.0f, -15.0f, 0});
         glLightfv(GL_LIGHT0(), GL_POSITION(), pos);
-        var spec = scope.allocateArray(C_FLOAT, new float[] {1, 1, 1, 0});
+        var spec = allocator.allocateArray(C_FLOAT, new float[] {1, 1, 1, 0});
         glLightfv(GL_LIGHT0(), GL_AMBIENT(), spec);
         glLightfv(GL_LIGHT0(), GL_DIFFUSE(), spec);
         glLightfv(GL_LIGHT0(), GL_SPECULAR(), spec);
-        var shini = scope.allocate(C_FLOAT, 113);
+        var shini = allocator.allocate(C_FLOAT, 113);
         glMaterialfv(GL_FRONT(), GL_SHININESS(), shini);
         glEnable(GL_LIGHTING());
         glEnable(GL_LIGHT0());
@@ -71,12 +72,13 @@ public class Teapot {
 
     public static void main(String[] args) {
         try (var scope = ResourceScope.newConfinedScope()) {
-            var argc = scope.allocate(C_INT, 0);
+            var allocator = SegmentAllocator.newNativeArena(scope);
+            var argc = allocator.allocate(C_INT, 0);
             glutInit(argc, argc);
             glutInitDisplayMode(GLUT_DOUBLE() | GLUT_RGB() | GLUT_DEPTH());
             glutInitWindowSize(500, 500);
-            glutCreateWindow(scope.allocateUtf8String("Hello Panama!"));
-            var teapot = new Teapot(scope);
+            glutCreateWindow(allocator.allocateUtf8String("Hello Panama!"));
+            var teapot = new Teapot(allocator);
             var displayStub = glutDisplayFunc$func.allocate(teapot::display, scope);
             var idleStub = glutIdleFunc$func.allocate(teapot::onIdle, scope);
             glutDisplayFunc(displayStub);

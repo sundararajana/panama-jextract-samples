@@ -30,6 +30,7 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 // import jextracted tcl 'header' class
 import static org.tcl.tcl_h.*;
@@ -53,7 +54,8 @@ public class TCLMain {
         """;
 
         try (var scope = ResourceScope.newConfinedScope()) {
-            var str = scope.allocateUtf8String(script);
+            var allocator = SegmentAllocator.newNativeArena(scope);
+            var str = allocator.allocateUtf8String(script);
             Tcl_Eval(interp, str);
         }
 

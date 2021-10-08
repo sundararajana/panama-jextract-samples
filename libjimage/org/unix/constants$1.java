@@ -9,9 +9,9 @@ import jdk.incubator.foreign.*;
 import static jdk.incubator.foreign.ValueLayout.*;
 class constants$1 {
 
-    static final MemorySegment __DARWIN_SUF_64_BIT_INO_T$SEGMENT = ResourceScope.globalScope().allocateUtf8String("$INODE64");
-    static final MemorySegment __DARWIN_SUF_1050$SEGMENT = ResourceScope.globalScope().allocateUtf8String("$1050");
-    static final MemorySegment __DARWIN_SUF_EXTSN$SEGMENT = ResourceScope.globalScope().allocateUtf8String("$DARWIN_EXTSN");
+    static final MemorySegment __DARWIN_SUF_64_BIT_INO_T$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("$INODE64");
+    static final MemorySegment __DARWIN_SUF_1050$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("$1050");
+    static final MemorySegment __DARWIN_SUF_EXTSN$SEGMENT = RuntimeHelper.CONSTANT_ALLOCATOR.allocateUtf8String("$DARWIN_EXTSN");
     static final MemoryAddress RTLD_NEXT$ADDR = MemoryAddress.ofLong(-1L);
     static final MemoryAddress RTLD_DEFAULT$ADDR = MemoryAddress.ofLong(-2L);
     static final MemoryAddress RTLD_SELF$ADDR = MemoryAddress.ofLong(-3L);

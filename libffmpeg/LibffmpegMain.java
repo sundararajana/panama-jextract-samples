@@ -75,10 +75,11 @@ public class LibffmpegMain {
         var buffer = NULL;
 
         try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.newNativeArena(scope);
             // AVFormatContext *ppFormatCtx;
             var ppFormatCtx = MemorySegment.allocateNative(C_POINTER, scope);
             // char* fileName;
-            var fileName = scope.allocateUtf8String(args[0]);
+            var fileName = allocator.allocateUtf8String(args[0]);
 
             // open video file
             if (avformat_open_input(ppFormatCtx, fileName, NULL, NULL) != 0) {

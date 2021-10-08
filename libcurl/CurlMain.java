@@ -30,6 +30,7 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.jextract.curl_h.*;
 import org.jextract.*;
@@ -41,7 +42,8 @@ public class CurlMain {
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
            try (var scope = ResourceScope.newConfinedScope()) {
-               var url = scope.allocateUtf8String(urlStr);
+               var allocator = SegmentAllocator.newNativeArena(scope);
+               var url = allocator.allocateUtf8String(urlStr);
                curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);
                if (res != CURLE_OK()) {

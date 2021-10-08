@@ -46,12 +46,13 @@ public class TensorflowLoadSavedModel {
         }
 
         try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.newNativeArena(scope);
             var graph = TF_NewGraph();
             var status = TF_NewStatus();
             var sessionOpts = TF_NewSessionOptions();
 
-            var savedModelDir = scope.allocateUtf8String(args[0]);
-            var tags = scope.allocate(C_POINTER, scope.allocateUtf8String("serve"));
+            var savedModelDir = allocator.allocateUtf8String(args[0]);
+            var tags = allocator.allocate(C_POINTER, allocator.allocateUtf8String("serve"));
             var session = TF_LoadSessionFromSavedModel(sessionOpts, NULL, savedModelDir, tags, 1, graph, NULL, status);
 
             if (TF_GetCode(status) != TF_OK()) {
@@ -62,7 +63,7 @@ public class TensorflowLoadSavedModel {
             }
 
             // print operations
-            var size = scope.allocate(C_LONG_LONG);
+            var size = allocator.allocate(C_LONG_LONG);
             var operation = NULL;
             while (!(operation = TF_GraphNextOperation(graph, size)).equals(NULL)) {
                 System.out.printf("%s : %s\n",

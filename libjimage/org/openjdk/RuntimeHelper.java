@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import org.unix.dlfcn_h;
 import static jdk.incubator.foreign.CLinker.*;
 import static jdk.incubator.foreign.ValueLayout.*;
@@ -34,18 +35,23 @@ final class RuntimeHelper {
     private final static MethodHandles.Lookup MH_LOOKUP = MethodHandles.lookup();
     private final static SymbolLookup SYMBOL_LOOKUP;
 
+    final static SegmentAllocator CONSTANT_ALLOCATOR =
+            (size, align) -> MemorySegment.allocateNative(size, align, ResourceScope.newImplicitScope());
+
     // looks up symbols using dlsym - manual change
     private static SymbolLookup dlopenLookup(String libraryName) {
         System.out.println("loading " + libraryName);
         var globalScope = ResourceScope.globalScope();
         try (ResourceScope openScope = ResourceScope.newConfinedScope()) {
-            final MemoryAddress handle = dlfcn_h.dlopen(openScope.allocateUtf8String(libraryName), dlfcn_h.RTLD_LOCAL());
+            var openScopeAllocator = SegmentAllocator.newNativeArena(openScope);
+            final MemoryAddress handle = dlfcn_h.dlopen(openScopeAllocator.allocateUtf8String(libraryName), dlfcn_h.RTLD_LOCAL());
             if (handle == MemoryAddress.NULL) {
                 throw new IllegalArgumentException("Cannot find library: " + libraryName);
             }
             globalScope.addCloseAction(() -> dlfcn_h.dlclose(handle));
             return name -> {
-                MemoryAddress addr = dlfcn_h.dlsym(handle, globalScope.allocateUtf8String(name));
+                var allocator = SegmentAllocator.newNativeArena(globalScope);
+                MemoryAddress addr = dlfcn_h.dlsym(handle, allocator.allocateUtf8String(name));
                 return addr == MemoryAddress.NULL ?
                             Optional.empty() : Optional.of(NativeSymbol.ofAddress(name, addr, globalScope));
             };
@@ -53,7 +59,7 @@ final class RuntimeHelper {
     }
 
     static {
-        // manual change 
+        // manual change
         SymbolLookup dlopenLookup = dlopenLookup(System.getProperty("java.home") + "/lib/libjimage.dylib");
         SYMBOL_LOOKUP = name -> dlopenLookup.lookup(name).or(() -> LINKER.lookup(name));
     }

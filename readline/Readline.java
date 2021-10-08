@@ -30,13 +30,15 @@
  */
 
 import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import static org.unix.readline_h.*;
 import org.unix.*;
 
 public class Readline {
     public static void main(String[] args) {
        try (var scope = ResourceScope.newConfinedScope()) {
-            var url = scope.allocateUtf8String("name? ");
+            var allocator = SegmentAllocator.newNativeArena(scope);
+            var url = allocator.allocateUtf8String("name? ");
 
             // call "readline" API
             var p = readline(url);

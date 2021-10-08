@@ -32,6 +32,7 @@
 import jdk.incubator.foreign.MemoryAddress;
 import jdk.incubator.foreign.MemorySegment;
 import jdk.incubator.foreign.ResourceScope;
+import jdk.incubator.foreign.SegmentAllocator;
 import org.sqlite.*;
 import static jdk.incubator.foreign.MemoryAddress.NULL;
 import static org.sqlite.sqlite3_h.*;
@@ -39,13 +40,14 @@ import static org.sqlite.sqlite3_h.*;
 public class SqliteMain {
    public static void main(String[] args) throws Exception {
         try (var scope = ResourceScope.newConfinedScope()) {
+            var allocator = SegmentAllocator.newNativeArena(scope);
             // char** errMsgPtrPtr;
-            var errMsgPtrPtr = scope.allocate(C_POINTER);
+            var errMsgPtrPtr = allocator.allocate(C_POINTER);
 
             // sqlite3** dbPtrPtr;
-            var dbPtrPtr = scope.allocate(C_POINTER);
+            var dbPtrPtr = allocator.allocate(C_POINTER);
 
-            int rc = sqlite3_open(scope.allocateUtf8String("employee.db"), dbPtrPtr);
+            int rc = sqlite3_open(allocator.allocateUtf8String("employee.db"), dbPtrPtr);
             if (rc != 0) {
                 System.err.println("sqlite3_open failed: " + rc);
                 return;
@@ -57,7 +59,7 @@ public class SqliteMain {
             var dbPtr = dbPtrPtr.get(C_POINTER, 0);
 
             // create a new table
-            var sql = scope.allocateUtf8String(
+            var sql = allocator.allocateUtf8String(
                 "CREATE TABLE EMPLOYEE ("  +
                 "  ID INT PRIMARY KEY NOT NULL," +
                 "  NAME TEXT NOT NULL,"    +
@@ -74,7 +76,7 @@ public class SqliteMain {
             }
 
             // insert two rows
-            sql = scope.allocateUtf8String(
+            sql = allocator.allocateUtf8String(
                 "INSERT INTO EMPLOYEE (ID,NAME,SALARY) " +
                     "VALUES (134, 'Xyz', 200000.0); " +
                 "INSERT INTO EMPLOYEE (ID,NAME,SALARY) " +
@@ -107,7 +109,7 @@ public class SqliteMain {
             }, scope);
 
             // select query
-            sql = scope.allocateUtf8String("SELECT * FROM EMPLOYEE");
+            sql = allocator.allocateUtf8String("SELECT * FROM EMPLOYEE");
             rc = sqlite3_exec(dbPtr, sql, callback, NULL, errMsgPtrPtr);
 
             if (rc != 0) {
