@@ -54,7 +54,7 @@ public class TCLMain {
         """;
 
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.newNativeArena(scope);
+            var allocator = SegmentAllocator.nativeAllocator(scope);
             var str = allocator.allocateUtf8String(script);
             Tcl_Eval(interp, str);
         }

@@ -42,7 +42,7 @@ public class CurlMain {
        var curl = curl_easy_init();
        if(!curl.equals(NULL)) {
            try (var scope = ResourceScope.newConfinedScope()) {
-               var allocator = SegmentAllocator.newNativeArena(scope);
+               var allocator = SegmentAllocator.nativeAllocator(scope);
                var url = allocator.allocateUtf8String(urlStr);
                curl_easy_setopt(curl, CURLOPT_URL(), url.address());
                int res = curl_easy_perform(curl);

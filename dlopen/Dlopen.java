@@ -40,14 +40,14 @@ public class Dlopen {
     // and looks up symbols using dlsym
     private static SymbolLookup lookup(String libraryName, ResourceScope scope) {
         try (ResourceScope openScope = ResourceScope.newConfinedScope()) {
-            var openScopeAllocator = SegmentAllocator.newNativeArena(openScope);
+            var openScopeAllocator = SegmentAllocator.nativeAllocator(openScope);
             var handle = dlopen(openScopeAllocator.allocateUtf8String(libraryName), RTLD_LOCAL());
             if (handle == MemoryAddress.NULL) {
                 throw new IllegalArgumentException("Cannot find library: " + libraryName);
             }
             scope.addCloseAction(() -> dlclose(handle));
             return name -> {
-                var allocator = SegmentAllocator.newNativeArena(scope);
+                var allocator = SegmentAllocator.nativeAllocator(scope);
                 var addr = dlsym(handle, allocator.allocateUtf8String(name));
                 return addr == MemoryAddress.NULL ?
                             Optional.empty() : Optional.of(NativeSymbol.ofAddress(name, addr, scope));
@@ -59,7 +59,7 @@ public class Dlopen {
         var arg = args.length > 0? args[0] : "Java";
         var libName = "libhello.dylib";
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.newNativeArena(scope);
+            var allocator = SegmentAllocator.nativeAllocator(scope);
             var symLookup = lookup(libName, scope);
 
             var linker = CLinker.systemCLinker();

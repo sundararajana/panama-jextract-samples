@@ -37,7 +37,7 @@ import org.unix.*;
 public class Readline {
     public static void main(String[] args) {
        try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.newNativeArena(scope);
+            var allocator = SegmentAllocator.nativeAllocator(scope);
             var url = allocator.allocateUtf8String("name? ");
 
             // call "readline" API

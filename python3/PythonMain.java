@@ -42,7 +42,7 @@ public class PythonMain {
 
         Py_Initialize();
         try (var scope = ResourceScope.newConfinedScope()) {
-            var allocator = SegmentAllocator.newNativeArena(scope);
+            var allocator = SegmentAllocator.nativeAllocator(scope);
             var str = allocator.allocateUtf8String(script);
             PyRun_SimpleStringFlags(str, NULL);
             Py_Finalize();
