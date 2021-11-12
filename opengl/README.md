@@ -1,7 +1,7 @@
 ## Notes on Windows
 
-This sample requires freeglut as a dependency. On Windows the freeglut package that comes with MingW is know not to work,
-because clang (which jextract uses under the hood) doesn't seem to understand MingW builtins found in the MingW standard library header files.
+This sample requires freeglut as a dependency. On Windows the freeglut package that comes with MinGW is know not to work,
+because clang (which jextract uses under the hood) doesn't seem to understand MinGW builtins found in the MinGW standard library header files.
 
 The sample has been tested against the freeglut MSVC package found here: https://www.transmissionzero.co.uk/software/freeglut-devel/
 
