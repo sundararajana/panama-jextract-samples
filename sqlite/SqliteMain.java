@@ -97,8 +97,8 @@ public class SqliteMain {
             var callback = sqlite3_exec$callback.allocate((a, argc, argv, columnNames) -> {
                 System.out.println("Row num: " + rowNum[0]++);
                 System.out.println("numColumns = " + argc);
-                var argv_seg = MemorySegment.ofAddressNative(argv, C_POINTER.byteSize() * argc, scope);
-                var columnNames_seg = MemorySegment.ofAddressNative(columnNames, C_POINTER.byteSize() * argc, scope);
+                var argv_seg = MemorySegment.ofAddress(argv, C_POINTER.byteSize() * argc, scope);
+                var columnNames_seg = MemorySegment.ofAddress(columnNames, C_POINTER.byteSize() * argc, scope);
                 for (int i = 0; i < argc; i++) {
                      String name = columnNames_seg.getAtIndex(C_POINTER, i).getUtf8String(0);
                      String value = argv_seg.getAtIndex(C_POINTER, i).getUtf8String(0);

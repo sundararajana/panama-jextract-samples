@@ -105,13 +105,13 @@ public class LibffmpegMain {
             // Find the first video stream
             int videoStream = -1;
             // AVFrameContext formatCtx;
-            var formatCtx = MemorySegment.ofAddressNative(pFormatCtx, AVFormatContext.sizeof(), scope);
+            var formatCtx = MemorySegment.ofAddress(pFormatCtx, AVFormatContext.sizeof(), scope);
             // formatCtx.nb_streams
             int nb_streams = AVFormatContext.nb_streams$get(formatCtx);
             System.out.println("number of streams: " + nb_streams);
             // formatCtx.streams
             var pStreams = AVFormatContext.streams$get(formatCtx);
-            var streamsArray = MemorySegment.ofAddressNative(pStreams, nb_streams * C_POINTER.byteSize(), scope);
+            var streamsArray = MemorySegment.ofAddress(pStreams, nb_streams * C_POINTER.byteSize(), scope);
 
             // AVCodecContext* pVideoCodecCtx;
             var pVideoCodecCtx = NULL;
@@ -121,10 +121,10 @@ public class LibffmpegMain {
                 // AVStream* pStream;
                 var pStream = streamsArray.getAtIndex(C_POINTER, i);
                 // AVStream stream;
-                var stream = MemorySegment.ofAddressNative(pStream, AVStream.sizeof(), scope);
+                var stream = MemorySegment.ofAddress(pStream, AVStream.sizeof(), scope);
                 // AVCodecContext* pCodecCtx;
                 pCodecCtx = AVStream.codec$get(stream);
-                var avcodecCtx = MemorySegment.ofAddressNative(pCodecCtx, AVCodecContext.sizeof(), scope);
+                var avcodecCtx = MemorySegment.ofAddress(pCodecCtx, AVCodecContext.sizeof(), scope);
                 if (AVCodecContext.codec_type$get(avcodecCtx) == AVMEDIA_TYPE_VIDEO()) {
                     videoStream = i;
                     pVideoCodecCtx = pCodecCtx;
@@ -166,7 +166,7 @@ public class LibffmpegMain {
             pFrameRGB = av_frame_alloc();
 
             // Determine required buffer size and allocate buffer
-            var codecCtx = MemorySegment.ofAddressNative(pCodecCtx, AVCodecContext.sizeof(), scope);
+            var codecCtx = MemorySegment.ofAddress(pCodecCtx, AVCodecContext.sizeof(), scope);
             int width = AVCodecContext.width$get(codecCtx);
             int height = AVCodecContext.height$get(codecCtx);
             int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24(), width, height);
@@ -176,11 +176,11 @@ public class LibffmpegMain {
             if (pFrame.equals(NULL)) {
                 throw new ExitException(1, "Cannot allocate frame");
             }
-            var frame = MemorySegment.ofAddressNative(pFrame, AVFrame.sizeof(), scope);
+            var frame = MemorySegment.ofAddress(pFrame, AVFrame.sizeof(), scope);
             if (pFrameRGB.equals(NULL)) {
                 throw new ExitException(1, "Cannot allocate RGB frame");
             }
-            var frameRGB = MemorySegment.ofAddressNative(pFrameRGB, AVFrame.sizeof(), scope);
+            var frameRGB = MemorySegment.ofAddress(pFrameRGB, AVFrame.sizeof(), scope);
             if (buffer.equals(NULL)) {
                 throw new ExitException(1, "cannot allocate buffer");
             }
@@ -282,7 +282,7 @@ public class LibffmpegMain {
             // Write pixel data
             for (int y = 0; y < height; y++) {
                 // frameRGB.data[0] + y*frameRGB.linesize[0] is the pointer. And 3*width size of data
-                var pixelArray = MemorySegment.ofAddressNative(pdata.addOffset(y*linesize), 3*width, scope);
+                var pixelArray = MemorySegment.ofAddress(pdata.addOffset(y*linesize), 3*width, scope);
                 // dump the pixel byte buffer to file
                 os.write(pixelArray.toArray(C_CHAR));
             }
