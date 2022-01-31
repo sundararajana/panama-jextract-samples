@@ -5,6 +5,10 @@ cd dlopen
 rm -rf org
 rm -rf libhello.dylib
 cd ..
+cd go
+rm -rf org
+rm -rf libhello.*
+cd ..
 cd helloworld
 rm -rf org
 rm -rf libhelloworld.dylib
@@ -32,9 +36,6 @@ rm -rf org
 cd ..
 cd opengl
 rm -rf opengl
-cd ..
-cd python
-rm -rf org
 cd ..
 cd python3
 rm -rf org

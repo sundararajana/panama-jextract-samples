@@ -7,6 +7,10 @@ echo "compiling dlopen"
 cd dlopen
 sh ./compile.sh
 cd ..
+echo "compiling go"
+cd go
+sh ./compile.sh
+cd ..
 echo "compiling helloworld"
 cd helloworld
 sh ./compile.sh
@@ -41,10 +45,6 @@ sh ./compile.sh
 cd ..
 echo "compiling opengl"
 cd opengl
-sh ./compile.sh
-cd ..
-echo "compiling python"
-cd python
 sh ./compile.sh
 cd ..
 echo "compiling python3"
